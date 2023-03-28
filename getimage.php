@@ -1,25 +1,34 @@
 <?php
-$preset = "preset" . $_GET['preset'];
 
+if (isset($_GET['ip'])) {
+	$ip = $_GET['ip'];
+	$octet = explode(".", $_GET['ip']);
+	//echo $octet[3];
+	//exit();
+}
+
+// Call prestored Presets
 if (isset($_GET['call'])) {
-	echo "Variable 'call' is set.<br>";
-	$callurl = 'http://10.10.10.100/-wvhttp-01-/control.cgi?p='. $_GET['call'];
+	//echo "Variable 'call' is set.<br>";
+	$callurl = 'http://'. $ip .'/-wvhttp-01-/control.cgi?p='. $_GET['call'];
 	file_get_contents($callurl);
 }
 
+// Strore Presets
 if (isset($_GET['preset'])) {
-	echo "Variable 'preset' is set.<br>";
+	//echo "Variable 'preset' is set.<br>";
+	$preset = "preset" . $_GET['preset'];
 	//echo $preset;
 	//exit();
 	// Remote image URL
 	
 	// URL for saving image
-	$url = 'http://10.10.10.100/-wvhttp-01-/image.cgi';
+	$url = 'http://'. $ip .'/-wvhttp-01-/image.cgi';
 	// URL for setting preset
-	$preseturl = 'http://10.10.10.100/-wvhttp-01-/preset/set?&p=' . $_GET['preset'] . '&name='. $preset .'&all=enabled';
+	$preseturl = 'http://'. $ip .'/-wvhttp-01-/preset/set?&p=' . $_GET['preset'] . '&name='. $preset .'&all=enabled';
 	
 	// Image path
-	$img = $preset . '.jpg';
+	$img = $octet[3] . '/' . $preset . '.jpg';
 	
 	// Save image 
 	file_put_contents($img, file_get_contents($url));
