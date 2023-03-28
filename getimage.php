@@ -7,6 +7,13 @@ if (isset($_GET['ip'])) {
 	//exit();
 }
 
+// Delete Preset
+if (isset($_GET['delete'])) {
+	$deleteurl = 'http://'. $ip .'/-wvhttp-01-/preset/set?&p=' . $_GET['delete'] . '&name=&ptz=disabled';
+	unlink($octet[3].'/preset'.$_GET['delete'].'.jpg');
+	file_get_contents($deleteurl);
+}
+
 // Call prestored Presets
 if (isset($_GET['call'])) {
 	//echo "Variable 'call' is set.<br>";

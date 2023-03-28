@@ -96,14 +96,22 @@ echo '<html>
 	
 		<div class="big-grid content">
 			<div class="grid-container">';
-			$n=0;
+			$n=1;
 			$ip=$ipcam1; $octet = explode(".", $ipcam1);
-			while($n<=10){    
+			while($n<=10){
+				if (file_exists($octet[3].'/preset'.$n.'.jpg')) {
+					$imgurl=$octet[3].'/preset'.$n.'.jpg';
+				} else {
+					$imgurl='images/empty.jpg';
+				}   
 			echo '
 				
 				<div>
-					<img src="'.$octet[3].'/preset'.$n.'.jpg" class="presets" />
-					<span style="float: left; padding-left: 15px;"><a href="getimage.php?ip='. $ip .'&preset='.$n.'"><img src="images/baseline_save_white_24dp.png"/></a></span>
+					<img src="'.$imgurl.'" class="presets" />
+					<span style="float: left; padding-left: 15px;"><a href="getimage.php?ip='. $ip .'&preset='.$n.'"><img src="images/baseline_save_white_24dp.png"/></a>
+					<a href="getimage.php?ip='. $ip .'&delete='.$n.'"><img src="images/outline_delete_white_24dp.png"/></a>
+
+					</span>
 					<span style="float: right; padding-right: 15px;"><a href="getimage.php?ip='. $ip .'&call='.$n.'"><img src="images/baseline_play_arrow_white_24dp.png"/></a></span>
 					<p class="center">Preset'.$n.'</p>
 				</div>';    
@@ -123,13 +131,18 @@ echo '<html>
 	
 		<div class="big-grid content">
 			<div class="grid-container">';
-			$n=0;
+			$n=1;
 			$ip=$ipcam2; $octet = explode(".", $ipcam2);
-			while($n<=10){    
+			while($n<=10){
+				if (file_exists($octet[3].'/preset'.$n.'.jpg')) {
+					$imgurl=$octet[3].'/preset'.$n.'.jpg';
+				} else {
+					$imgurl='images/empty.jpg';
+				}  
 			echo '
 				
 				<div>
-					<img src="'.$octet[3].'/preset'.$n.'.jpg" class="presets" />
+					<img src="'.$imgurl.'" class="presets" />
 					<span style="float: left; padding-left: 15px;"><a href="getimage.php?ip='. $ip .'&preset='.$n.'"><img src="images/baseline_save_white_24dp.png"/></a></span>
 					<span style="float: right; padding-right: 15px;"><a href="getimage.php?ip='. $ip .'&call='.$n.'"><img src="images/baseline_play_arrow_white_24dp.png"/></a></span>
 					<p class="center">Preset'.$n.'</p>
@@ -150,13 +163,20 @@ echo '<html>
 	
 		<div class="big-grid content">
 			<div class="grid-container">';
-			$n=0;
+			$n=1;
 			$ip=$ipcam3; $octet = explode(".", $ipcam3); 
-			while($n<=10){    
+			while($n<=10){
+
+				if (file_exists($octet[3].'/preset'.$n.'.jpg')) {
+					$imgurl=$octet[3].'/preset'.$n.'.jpg';
+				} else {
+					$imgurl='images/empty.jpg';
+				}
+
 			echo '
 				
 				<div>
-					<img src="'.$octet[3].'/preset'.$n.'.jpg" class="presets" />
+					<img src="'.$imgurl.'" class="presets" />
 					<span style="float: left; padding-left: 15px;"><a href="getimage.php?ip='. $ip .'&preset='.$n.'"><img src="images/baseline_save_white_24dp.png"/></a></span>
 					<span style="float: right; padding-right: 15px;"><a href="getimage.php?ip='. $ip .'&call='.$n.'"><img src="images/baseline_play_arrow_white_24dp.png"/></a></span>
 					<p class="center">Preset'.$n.'</p>
