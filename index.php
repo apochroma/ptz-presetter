@@ -122,6 +122,7 @@ echo '<html>
 	
 		<div class="big-grid content">
 			<div class="grid-container">';
+			$index=getIndexActivePreset($ipcam1);
 			$n=1;
 			$ip=$ipcam1; $octet = explode(".", $ipcam1);
 			while($n<=10){
@@ -130,9 +131,6 @@ echo '<html>
 				} else {
 					$imgurl='images/empty.jpg';
 				}
-				
-				$index=getIndexActivePreset($ipcam1);
-
 				if ($n == $index) {
 					echo '
 				<div class="active">';
@@ -163,6 +161,7 @@ echo '<html>
 	
 		<div class="big-grid content">
 			<div class="grid-container">';
+			$index=getIndexActivePreset($ipcam2);
 			$n=1;
 			$ip=$ipcam2; $octet = explode(".", $ipcam2);
 			while($n<=10){
@@ -171,9 +170,6 @@ echo '<html>
 				} else {
 					$imgurl='images/empty.jpg';
 				}
-				
-				$index=getIndexActivePreset($ipcam2);
-
 				if ($n == $index) {
 					echo '
 				<div class="active">';
@@ -204,6 +200,7 @@ echo '<html>
 	
 		<div class="big-grid content">
 			<div class="grid-container">';
+			$index=getIndexActivePreset($ipcam3);
 			$n=1;
 			$ip=$ipcam3; $octet = explode(".", $ipcam3);
 			while($n<=10){
@@ -212,8 +209,6 @@ echo '<html>
 				} else {
 					$imgurl='images/empty.jpg';
 				}
-				
-				$index=getIndexActivePreset($ipcam3);
 
 				if ($n == $index) {
 					echo '
