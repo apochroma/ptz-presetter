@@ -13,7 +13,24 @@ $ipcam1="10.10.10.100";
 $ipcam2="10.10.10.101";
 $ipcam3="10.10.10.102";
 
-$preset=1;
+
+function getIndexActivePreset($address) {
+	$result=file_get_contents('http://'. $address .'/-wvhttp-01-/info.cgi?item=p');
+	$presetArray = explode(PHP_EOL, $result);
+	return substr($presetArray[2], -1);
+}
+
+// --> $showme="http://10.10.10.100/-wvhttp-01-/info.cgi?item=p";
+// --> $result=file_get_contents($showme); 
+
+//build an array of all the key=>value pairs, we are interested in the last used/set preset, that is array index 2
+// --> $presetArray = explode(PHP_EOL, $result);
+//echo $arr[2];
+//echo substr($arr[2], -1);
+
+// --> $index=substr($presetArray[2], -1);
+
+
 echo '<html>
 <head>
 	
@@ -84,6 +101,15 @@ echo '<html>
 			transform: rotate(-90deg);
 		}
 
+		#102a1 {
+			border: red 2px solid;
+			background-color: cornflowerblue;
+		}
+
+		.active {
+			background-color: cornflowerblue;
+		}
+
 	</style>
 </head>
 <body>
@@ -103,14 +129,20 @@ echo '<html>
 					$imgurl=$octet[3].'/preset'.$n.'.jpg';
 				} else {
 					$imgurl='images/empty.jpg';
-				}   
-			echo '
+				}
 				
-				<div>
-					<img src="'.$imgurl.'" class="presets" />
+				$index=getIndexActivePreset($ipcam1);
+
+				if ($n == $index) {
+					echo '
+				<div class="active">';
+				} else {
+					echo '
+				<div>';
+				}
+			echo "\n\t\t\t\t\t".'<img src="'.$imgurl.'" class="presets" />
 					<span style="float: left; padding-left: 15px;"><a href="getimage.php?ip='. $ip .'&preset='.$n.'"><img src="images/baseline_save_white_24dp.png"/></a>
 					<a href="getimage.php?ip='. $ip .'&delete='.$n.'"><img src="images/outline_delete_white_24dp.png"/></a>
-
 					</span>
 					<span style="float: right; padding-right: 15px;"><a href="getimage.php?ip='. $ip .'&call='.$n.'"><img src="images/baseline_play_arrow_white_24dp.png"/></a></span>
 					<p class="center">Preset'.$n.'</p>
@@ -138,12 +170,21 @@ echo '<html>
 					$imgurl=$octet[3].'/preset'.$n.'.jpg';
 				} else {
 					$imgurl='images/empty.jpg';
-				}  
-			echo '
+				}
 				
-				<div>
-					<img src="'.$imgurl.'" class="presets" />
-					<span style="float: left; padding-left: 15px;"><a href="getimage.php?ip='. $ip .'&preset='.$n.'"><img src="images/baseline_save_white_24dp.png"/></a></span>
+				$index=getIndexActivePreset($ipcam2);
+
+				if ($n == $index) {
+					echo '
+				<div class="active">';
+				} else {
+					echo '
+				<div>';
+				}
+			echo "\n\t\t\t\t\t".'<img src="'.$imgurl.'" class="presets" />
+					<span style="float: left; padding-left: 15px;"><a href="getimage.php?ip='. $ip .'&preset='.$n.'"><img src="images/baseline_save_white_24dp.png"/></a>
+					<a href="getimage.php?ip='. $ip .'&delete='.$n.'"><img src="images/outline_delete_white_24dp.png"/></a></span>
+					
 					<span style="float: right; padding-right: 15px;"><a href="getimage.php?ip='. $ip .'&call='.$n.'"><img src="images/baseline_play_arrow_white_24dp.png"/></a></span>
 					<p class="center">Preset'.$n.'</p>
 				</div>';    
@@ -164,20 +205,27 @@ echo '<html>
 		<div class="big-grid content">
 			<div class="grid-container">';
 			$n=1;
-			$ip=$ipcam3; $octet = explode(".", $ipcam3); 
+			$ip=$ipcam3; $octet = explode(".", $ipcam3);
 			while($n<=10){
-
 				if (file_exists($octet[3].'/preset'.$n.'.jpg')) {
 					$imgurl=$octet[3].'/preset'.$n.'.jpg';
 				} else {
 					$imgurl='images/empty.jpg';
 				}
-
-			echo '
 				
-				<div>
-					<img src="'.$imgurl.'" class="presets" />
-					<span style="float: left; padding-left: 15px;"><a href="getimage.php?ip='. $ip .'&preset='.$n.'"><img src="images/baseline_save_white_24dp.png"/></a></span>
+				$index=getIndexActivePreset($ipcam3);
+
+				if ($n == $index) {
+					echo '
+				<div class="active">';
+				} else {
+					echo '
+				<div>';
+				}
+			echo "\n\t\t\t\t\t".'<img src="'.$imgurl.'" class="presets" />
+					<span style="float: left; padding-left: 15px;"><a href="getimage.php?ip='. $ip .'&preset='.$n.'"><img src="images/baseline_save_white_24dp.png"/></a>
+					<a href="getimage.php?ip='. $ip .'&delete='.$n.'"><img src="images/outline_delete_white_24dp.png"/></a></span>
+					
 					<span style="float: right; padding-right: 15px;"><a href="getimage.php?ip='. $ip .'&call='.$n.'"><img src="images/baseline_play_arrow_white_24dp.png"/></a></span>
 					<p class="center">Preset'.$n.'</p>
 				</div>';    

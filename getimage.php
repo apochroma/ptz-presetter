@@ -16,7 +16,6 @@ if (isset($_GET['delete'])) {
 
 // Call prestored Presets
 if (isset($_GET['call'])) {
-	//echo "Variable 'call' is set.<br>";
 	$callurl = 'http://'. $ip .'/-wvhttp-01-/control.cgi?p='. $_GET['call'];
 	file_get_contents($callurl);
 }
@@ -42,9 +41,7 @@ if (isset($_GET['preset'])) {
 	#bis hierhin funktioniert es
 	file_get_contents($preseturl);
 }
-
 header("Refresh:0.1; url=index.php");
-
 ?>
 
 
