@@ -138,7 +138,7 @@ echo '<html>
 					echo '
 				<div>';
 				}
-			echo "\n\t\t\t\t\t".'<img src="'.$imgurl.'" class="presets" />
+			echo "\n\t\t\t\t\t".'<a href="getimage.php?ip='. $ip .'&call='.$n.'"><img src="'.$imgurl.'" class="presets" /></a>
 					<span style="float: left; padding-left: 15px;"><a href="getimage.php?ip='. $ip .'&preset='.$n.'"><img src="images/baseline_save_white_24dp.png"/></a>
 					<a href="getimage.php?ip='. $ip .'&delete='.$n.'"><img src="images/outline_delete_white_24dp.png"/></a>
 					</span>
@@ -177,7 +177,7 @@ echo '<html>
 					echo '
 				<div>';
 				}
-			echo "\n\t\t\t\t\t".'<img src="'.$imgurl.'" class="presets" />
+			echo "\n\t\t\t\t\t".'<a href="getimage.php?ip='. $ip .'&call='.$n.'"><img src="'.$imgurl.'" class="presets" /></a>
 					<span style="float: left; padding-left: 15px;"><a href="getimage.php?ip='. $ip .'&preset='.$n.'"><img src="images/baseline_save_white_24dp.png"/></a>
 					<a href="getimage.php?ip='. $ip .'&delete='.$n.'"><img src="images/outline_delete_white_24dp.png"/></a></span>
 					
@@ -217,7 +217,7 @@ echo '<html>
 					echo '
 				<div>';
 				}
-			echo "\n\t\t\t\t\t".'<img src="'.$imgurl.'" class="presets" />
+			echo "\n\t\t\t\t\t".'<a href="getimage.php?ip='. $ip .'&call='.$n.'"><img src="'.$imgurl.'" class="presets" /></a>
 					<span style="float: left; padding-left: 15px;"><a href="getimage.php?ip='. $ip .'&preset='.$n.'"><img src="images/baseline_save_white_24dp.png"/></a>
 					<a href="getimage.php?ip='. $ip .'&delete='.$n.'"><img src="images/outline_delete_white_24dp.png"/></a></span>
 					
