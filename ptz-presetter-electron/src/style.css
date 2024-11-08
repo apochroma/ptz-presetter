@@ -4,7 +4,7 @@ body {
   background-color: #333;
   color: #fff;
   margin: 0;
-  padding: 20px;
+  padding: 10px; /* Reduzierter Seitenrand */
 }
 
 #camera-container {
@@ -18,8 +18,8 @@ body {
   align-items: center;
   background-color: #222;
   border: 2px solid #444;
-  margin: 20px 0;
-  padding: 20px;
+  margin: 5px 0; /* Halbierte Abstände zwischen den Kamera-Blöcken */
+  padding: 10px; /* Weniger Padding innerhalb des Blocks */
   width: 90%;
   position: relative;
 }
@@ -29,15 +29,15 @@ body {
   transform: rotate(180deg);
   font-size: 1.5em;
   color: #bbb;
-  padding: 10px;
-  margin-right: 20px;
+  padding: 5px;
+  margin-right: 10px; /* Reduzierter Abstand zur Kamera-Titel-Spalte */
   align-self: center;
 }
 
 .presets {
   display: grid;
   grid-template-columns: repeat(5, 1fr); /* 5 Spalten */
-  gap: 10px;
+  gap: 5px; /* Kleinere Abstände zwischen den Thumbnails */
   justify-items: center;
   flex-grow: 1;
 }
@@ -55,10 +55,10 @@ body {
 }
 
 .thumbnail {
-  width: 100px;
-  height: 75px;
+  width: 150px; /* Erhöhte Breite */
+  height: 112px; /* Erhöhte Höhe, um das Seitenverhältnis beizubehalten */
   background-color: #666;
-  margin-right: 10px;
+  margin-right: 5px; /* Kleinere Abstände zu den Steuerelementen */
 }
 
 .preset-label {
@@ -67,7 +67,7 @@ body {
   left: 50%;
   transform: translateX(-50%); /* Zentriert das Label horizontal */
   color: #fff;
-  font-size: 0.8em;
+  font-size: 0.9em; /* Etwas größere Schriftgröße für bessere Lesbarkeit */
   padding: 2px;
 }
 
@@ -79,16 +79,16 @@ body {
 }
 
 .controls button {
-  font-size: 0.6em; /* Halbierte Schriftgröße */
-  background-color: #444; /* Dunkler Hintergrund */
-  color: #fff; /* Weiße Schrift */
+  font-size: 0.6em; /* Beibehaltung der kleineren Icon-Schriftgröße */
+  background-color: #444;
+  color: #fff;
   border: 1px solid #555;
   border-radius: 4px;
-  padding: 5px;
+  padding: 4px;
   cursor: pointer;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .controls button:hover {
-  background-color: #555; /* Etwas hellerer Hintergrund beim Hover */
+  background-color: #555; /* Hellerer Hintergrund beim Hover */
 }

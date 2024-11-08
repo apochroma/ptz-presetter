@@ -8,6 +8,8 @@ Wenn man das Repository zum ersten mal herunterlädt (cloned), müssen folgende 
 
 Das erstellt erst mal den Ordner `node_modules` und dort drin sind alle Module die es für Electron App braucht.
 
-## Build App
+## Lokalen Build erstellen
+Um die App zu testen:
+`npm start`
 
 Die App kann man mit dem Helper Script build.sh erstellen.
