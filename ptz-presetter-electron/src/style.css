@@ -1,0 +1,94 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #333;
+  color: #fff;
+  margin: 0;
+  padding: 20px;
+}
+
+#camera-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.camera-block {
+  display: flex;
+  align-items: center;
+  background-color: #222;
+  border: 2px solid #444;
+  margin: 20px 0;
+  padding: 20px;
+  width: 90%;
+  position: relative;
+}
+
+.camera-title {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 1.5em;
+  color: #bbb;
+  padding: 10px;
+  margin-right: 20px;
+  align-self: center;
+}
+
+.presets {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 5 Spalten */
+  gap: 10px;
+  justify-items: center;
+  flex-grow: 1;
+}
+
+.preset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.thumbnail-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.thumbnail {
+  width: 100px;
+  height: 75px;
+  background-color: #666;
+  margin-right: 10px;
+}
+
+.preset-label {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%); /* Zentriert das Label horizontal */
+  color: #fff;
+  font-size: 0.8em;
+  padding: 2px;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 5px;
+}
+
+.controls button {
+  font-size: 0.6em; /* Halbierte Schriftgröße */
+  background-color: #444; /* Dunkler Hintergrund */
+  color: #fff; /* Weiße Schrift */
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 5px;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+.controls button:hover {
+  background-color: #555; /* Etwas hellerer Hintergrund beim Hover */
+}

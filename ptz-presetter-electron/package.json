@@ -1,0 +1,16 @@
+{
+  "name": "ptz-presetter-electron",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "Claus Pfisterer",
+  "license": "ISC",
+  "description": "PTZ Presetter",
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-packager": "^17.1.2"
+  }
+}
