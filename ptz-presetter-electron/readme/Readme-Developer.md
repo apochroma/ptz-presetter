@@ -13,3 +13,11 @@ Um die App zu testen:
 `npm start`
 
 Die App kann man mit dem Helper Script build.sh erstellen.
+
+## Troubleshooting
+![](images/reame00.png)
+Das deutet darauf hin, dass die Module noch nicht installiert wurden.
+
+`npm install`
+`npm start`
+![](images/reame01.png)
