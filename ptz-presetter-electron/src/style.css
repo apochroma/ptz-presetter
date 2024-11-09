@@ -4,24 +4,68 @@ body {
   background-color: #333;
   color: #fff;
   margin: 0;
-  padding: 10px; /* Reduzierter Seitenrand */
+  padding: 10px;
+}
+
+h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+/* Position des Zahnrad-Icons oben links */
+#settings-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: #444;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 1.5em;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+  z-index: 1000; /* Sicherstellen, dass das Zahnrad über anderen Elementen liegt */
+}
+
+#settings-btn:hover {
+  background-color: #555;
+}
+
+/* Einstellungs-Sektion, die über den Kamera-Sektionen angezeigt wird */
+.settings-section {
+  position: fixed;
+  top: 0;
+  left: -100%; /* Beginnt außerhalb des Bildschirms */
+  width: 300px;
+  height: 100%;
+  background-color: #222;
+  padding: 20px;
+  color: white;
+  transition: left 0.5s ease-in-out;
+  z-index: 1001; /* Über den Kamera-Sektionen anzeigen */
+}
+
+.settings-section.visible {
+  left: 0; /* Einstellungs-Sektion wird über den Bildschirm hereingeschoben */
 }
 
 #camera-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 90%;
+  margin: auto;
 }
 
 .camera-block {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   background-color: #222;
   border: 2px solid #444;
-  margin: 5px 0; /* Halbierte Abstände zwischen den Kamera-Blöcken */
-  padding: 10px; /* Weniger Padding innerhalb des Blocks */
-  width: 90%;
-  position: relative;
+  margin: 10px 0;
+  padding: 15px;
+  width: 100%;
 }
 
 .camera-title {
@@ -30,16 +74,16 @@ body {
   font-size: 1.5em;
   color: #bbb;
   padding: 5px;
-  margin-right: 10px; /* Reduzierter Abstand zur Kamera-Titel-Spalte */
+  margin-right: 10px;
   align-self: center;
 }
 
 .presets {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 Spalten */
-  gap: 5px; /* Kleinere Abstände zwischen den Thumbnails */
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
   justify-items: center;
-  flex-grow: 1;
+  width: 100%;
 }
 
 .preset {
@@ -55,19 +99,19 @@ body {
 }
 
 .thumbnail {
-  width: 150px; /* Erhöhte Breite */
-  height: 112px; /* Erhöhte Höhe, um das Seitenverhältnis beizubehalten */
+  width: 150px;
+  height: 112px;
   background-color: #666;
-  margin-right: 5px; /* Kleinere Abstände zu den Steuerelementen */
+  margin-right: 10px;
 }
 
 .preset-label {
   position: absolute;
   bottom: 5px;
   left: 50%;
-  transform: translateX(-50%); /* Zentriert das Label horizontal */
+  transform: translateX(-50%);
   color: #fff;
-  font-size: 0.9em; /* Etwas größere Schriftgröße für bessere Lesbarkeit */
+  font-size: 0.9em;
   padding: 2px;
 }
 
@@ -79,7 +123,7 @@ body {
 }
 
 .controls button {
-  font-size: 0.6em; /* Beibehaltung der kleineren Icon-Schriftgröße */
+  font-size: 0.6em;
   background-color: #444;
   color: #fff;
   border: 1px solid #555;
@@ -90,5 +134,5 @@ body {
 }
 
 .controls button:hover {
-  background-color: #555; /* Hellerer Hintergrund beim Hover */
+  background-color: #555;
 }

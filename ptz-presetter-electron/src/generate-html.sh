@@ -10,17 +10,40 @@ cat <<EOF > $output_file
 <head>
   <meta charset="UTF-8">
   <title>PTZ Presetter</title>
+  <!-- Verweise auf die CSS-Dateien für das allgemeine Design und das Einstellungsmenü -->
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="settings.css">
 </head>
 <body>
   <h1>PTZ Presetter</h1>
+
+  <!-- Zahnrad-Button für Einstellungen oben links -->
+  <button id="settings-btn" onclick="toggleSettings()">⚙️</button>
+
+  <!-- Einstellungs-Sektion, die über den Kamera-Sektionen angezeigt wird -->
+  <div id="settings-section" class="settings-section">
+    <!-- Schließen-Button für das Einstellungsmenü oben links -->
+    <button id="close-settings-btn" onclick="toggleSettings()">✖️</button>
+    <h2>Einstellungen</h2>
+    <label for="cam1-ip">Cam 1 IP:</label>
+    <input type="text" id="cam1-ip" value="10.10.10.100">
+    <br>
+    <label for="cam2-ip">Cam 2 IP:</label>
+    <input type="text" id="cam2-ip" value="10.10.10.101">
+    <br>
+    <label for="cam3-ip">Cam 3 IP:</label>
+    <input type="text" id="cam3-ip" value="10.10.10.102">
+    <br>
+    <button onclick="saveSettings()">Speichern</button>
+  </div>
+
   <div id="camera-container">
 EOF
 
 # Funktion zum Erstellen eines Kamera-Blocks mit Presets
 generate_camera_block() {
   local camera_number=$1
-  echo "    <div class='camera-block' data-camera='$camera_number'>" >> $output_file
+  echo "    <div class='camera-block'>" >> $output_file
   echo "      <div class='camera-title'>Cam $camera_number</div>" >> $output_file
   echo "      <div class='presets'>" >> $output_file
 
@@ -51,10 +74,17 @@ for camera_number in {1..3}; do
   generate_camera_block $camera_number
 done
 
-# HTML-Ende
+# HTML-Ende mit JavaScript für das Einstellungsmenü und Schließen-Button
 cat <<EOF >> $output_file
   </div>
   <script src="renderer.js"></script>
+  <script>
+    // Toggle-Funktion für das Einstellungsmenü
+    function toggleSettings() {
+      const settingsSection = document.getElementById('settings-section');
+      settingsSection.classList.toggle('visible');
+    }
+  </script>
 </body>
 </html>
 EOF
