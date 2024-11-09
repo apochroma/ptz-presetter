@@ -1,109 +1,47 @@
-const fs = require('fs');
-const path = require('path');
-const { app } = require('@electron/remote'); // Zugriff auf das Electron app-Modul
+// Funktion zum Umschalten des Einstellungsmenüs
+function toggleSettings() {
+  const settingsSection = document.getElementById('settings-section');
+  const toggleButton = document.getElementById('toggle-settings-btn');
 
-// Speicherort der Datei festlegen
-const configFilePath = path.join(app.getPath('userData'), 'camera-config.json');
-
-// Standard-IP-Adressen
-let camIps = {
-  cam1: '10.10.10.100',
-  cam2: '10.10.10.101',
-  cam3: '10.10.10.102'
-};
-
-// Funktion zum Laden der IP-Adressen aus der Datei
-function loadSettings() {
-  if (fs.existsSync(configFilePath)) {
-    const data = fs.readFileSync(configFilePath);
-    camIps = JSON.parse(data);
-    document.getElementById('cam1-ip').value = camIps.cam1;
-    document.getElementById('cam2-ip').value = camIps.cam2;
-    document.getElementById('cam3-ip').value = camIps.cam3;
-    console.log("Einstellungen geladen:", camIps);
+  // Überprüfen, ob das Menü sichtbar ist und die Rotation entsprechend anwenden
+  if (settingsSection.classList.contains('visible')) {
+    settingsSection.classList.remove('visible');
+    toggleButton.classList.remove('rotate'); // Entfernt die Drehung beim Zuklappen
   } else {
-    console.log("Keine gespeicherten Einstellungen gefunden. Standardwerte werden verwendet.");
+    settingsSection.classList.add('visible');
+    toggleButton.classList.add('rotate'); // Fügt die Drehung beim Aufklappen hinzu
   }
 }
 
-// Funktion zum Speichern der IP-Adressen in die Datei
+// Funktion zum Speichern der IP-Adressen aus den Eingabefeldern
 function saveSettings() {
-  camIps.cam1 = document.getElementById('cam1-ip').value;
-  camIps.cam2 = document.getElementById('cam2-ip').value;
-  camIps.cam3 = document.getElementById('cam3-ip').value;
+  const cam1Ip = document.getElementById('cam1-ip').value;
+  const cam2Ip = document.getElementById('cam2-ip').value;
+  const cam3Ip = document.getElementById('cam3-ip').value;
 
-  fs.writeFileSync(configFilePath, JSON.stringify(camIps));
-  console.log("Neue IPs gespeichert:", camIps);
-  toggleSettings(); // Schließt das Einstellungsmenü nach dem Speichern
+  // Hier können die IP-Adressen gespeichert werden (z.B. in eine Datei oder in die Konsole ausgegeben)
+  console.log('Cam 1 IP:', cam1Ip);
+  console.log('Cam 2 IP:', cam2Ip);
+  console.log('Cam 3 IP:', cam3Ip);
+
+  // Optional: Schließe das Menü nach dem Speichern automatisch
+  toggleSettings();
 }
 
-// Funktion zum Ein- und Ausklappen des Akkordeons
-function toggleAccordion(button) {
-  const presetsContainer = button.nextElementSibling;
-  const isOpen = presetsContainer.style.display === "grid";
-
-  // Anzeige ein- oder ausschalten
-  presetsContainer.style.display = isOpen ? "none" : "grid";
-  button.style.fontWeight = isOpen ? "normal" : "bold";
-
-  // Dynamisches Ändern der Höhe
-  const cameraBlock = button.parentElement;
-  cameraBlock.style.maxHeight = isOpen ? "50px" : "500px"; // Geschätzte Werte für geschlossen und geöffnet
-  cameraBlock.style.padding = isOpen ? "10px" : "15px";
-}
-
-// Funktion zum Anzeigen oder Verstecken der Einstellungen
-function toggleSettings() {
-  const settingsSection = document.getElementById('settings-section');
-  settingsSection.classList.toggle('visible');
+// Funktion zum Abspielen eines Presets
+function playPreset(cameraNumber, presetNumber) {
+  console.log(`Playing preset ${presetNumber} for camera ${cameraNumber}`);
+  // Hier könnte der Code hinzugefügt werden, um die Kamera zum entsprechenden Preset zu bewegen
 }
 
 // Funktion zum Speichern eines Presets
-async function savePreset(cameraIndex, presetNumber) {
-  const ip = camIps[`cam${cameraIndex}`];
-  const imageUrl = `http://${ip}/-wvhttp-01-/image.cgi`;
-  const presetUrl = `http://${ip}/-wvhttp-01-/preset/set?&p=${presetNumber}&name=${presetNumber}&all=enabled`;
-
-  try {
-    await fetch(presetUrl); // Speichert das Preset
-    const response = await fetch(imageUrl); // Bild für Thumbnail herunterladen
-    const blob = await response.blob();
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      document.getElementById(`cam${cameraIndex}-preset${presetNumber}`).src = reader.result;
-    };
-    reader.readAsDataURL(blob);
-  } catch (error) {
-    console.error(`Fehler beim Speichern des Presets ${presetNumber} für Kamera ${cameraIndex}:`, error);
-  }
+function savePreset(cameraNumber, presetNumber) {
+  console.log(`Saving preset ${presetNumber} for camera ${cameraNumber}`);
+  // Hier könnte der Code hinzugefügt werden, um die aktuelle Position als Preset zu speichern
 }
 
 // Funktion zum Löschen eines Presets
-async function deletePreset(cameraIndex, presetNumber) {
-  const ip = camIps[`cam${cameraIndex}`];
-  const deleteUrl = `http://${ip}/-wvhttp-01-/preset/set?&p=${presetNumber}&name=${presetNumber}&name=&ptz=disabled`;
-
-  try {
-    await fetch(deleteUrl); // Löscht das Preset
-    document.getElementById(`cam${cameraIndex}-preset${presetNumber}`).src = 'images/empty.png'; // Setzt das Thumbnail zurück
-    console.log(`Preset ${presetNumber} für Kamera ${cameraIndex} gelöscht.`);
-  } catch (error) {
-    console.error(`Fehler beim Löschen des Presets ${presetNumber} für Kamera ${cameraIndex}:`, error);
-  }
+function deletePreset(cameraNumber, presetNumber) {
+  console.log(`Deleting preset ${presetNumber} for camera ${cameraNumber}`);
+  // Hier könnte der Code hinzugefügt werden, um das gespeicherte Preset zu löschen
 }
-
-// Funktion zum Ausführen eines Presets
-async function playPreset(cameraIndex, presetNumber) {
-  const ip = camIps[`cam${cameraIndex}`];
-  const playUrl = `http://${ip}/-wvhttp-01-/info.cgi?item=p${presetNumber}`;
-
-  try {
-    await fetch(playUrl); // Preset ausführen
-    console.log(`Preset ${presetNumber} für Kamera ${cameraIndex} ausgeführt.`);
-  } catch (error) {
-    console.error(`Fehler beim Ausführen des Presets ${presetNumber} für Kamera ${cameraIndex}:`, error);
-  }
-}
-
-// Lädt die gespeicherten Einstellungen beim Start
-window.onload = loadSettings;

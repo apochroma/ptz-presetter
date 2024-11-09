@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, session } = require('electron');
 const path = require('path');
 
 function createWindow() {
@@ -15,7 +15,14 @@ function createWindow() {
   win.loadFile('src/index.html');
 }
 
-app.whenReady().then(createWindow);
+// Cache löschen und dann das Hauptfenster erstellen
+app.whenReady().then(() => {
+  // Cache leeren
+  session.defaultSession.clearCache().then(() => {
+    console.log('Cache wurde erfolgreich gelöscht');
+    createWindow(); // Hauptfenster nach Cache-Löschung öffnen
+  });
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -28,4 +35,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-

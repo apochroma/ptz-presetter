@@ -1,53 +1,46 @@
-/* Schließen-Button für das Einstellungsmenü */
-#close-settings-btn {
-  position: absolute;
-  width: calc(100% - 16px); /* Breite an den Padding-Wert angepasst */
-  bottom: 80px; /* Abstand vom unteren Rand */
-  left: 50%;
-  transform: translateX(-50%); /* Zentriert den Button horizontal */
+/* Umschalt-Icon für das Einstellungsmenü */
+#toggle-settings-btn {
+  position: fixed;
+  top: 10px;
+  left: 10px; /* Ständig am linken Rand des Fensters */
   background-color: rgba(255, 255, 255, 0.2); /* Leicht transparenter Hintergrund */
   color: #fff; /* Weißer Text für Sichtbarkeit */
   border: none;
-  font-size: 1.2em;
+  font-size: 1.5em;
   cursor: pointer;
   border-radius: 4px;
-  padding: 8px 16px; /* Größeres Padding für bessere Klickfläche */
-  transition: background-color 0.3s, color 0.3s;
+  padding: 4px 8px;
+  transition: transform 0.5s ease, background-color 0.3s, color 0.3s;
+  z-index: 1002; /* Höher als das Einstellungsmenü */
 }
 
-#close-settings-btn:hover {
-  background-color: rgba(255, 255, 255, 0.4); /* Heller beim Hover */
-  color: #222; /* Dunklere Farbe beim Hover */
-}
-
-/* Stil für den Titel im Einstellungsmenü */
-.settings-section h2 {
-  color: #bbb;
-  font-size: 1.8em;
-  margin: 20px 0;
-  text-align: center;
-  border-bottom: 1px solid #444;
-  padding-bottom: 10px;
+/* Drehe das Icon um 180 Grad, wenn das Menü sichtbar ist */
+#toggle-settings-btn.rotate {
+  transform: rotate(180deg);
 }
 
 /* Hauptstil für die Einstellungssektion */
 .settings-section {
   position: fixed;
   top: 0;
-  left: -100%;
+  left: 0; /* Anfangs ist es sichtbar, aber versteckt mit transform */
   width: 300px;
   height: 100%;
   background-color: #222;
   padding: 20px;
-  padding-bottom: 40px; /* Platz nach unten für den Schließen-Button */
+  padding-top: 50px; /* Platz für den Titel */
   color: white;
-  transition: left 0.5s ease-in-out;
-  z-index: 1001;
+  transform: translateX(-100%); /* Schiebt das Menü aus dem Bild */
+  opacity: 0; /* Versteckt das Menü visuell */
+  transition: transform 0.5s ease, opacity 0.5s ease; /* Animation für das Einblenden */
+  z-index: 1001; /* Niedriger als das Icon */
   box-shadow: 3px 0 5px rgba(0, 0, 0, 0.5);
 }
 
+/* Menü anzeigen, wenn die Klasse .visible vorhanden ist */
 .settings-section.visible {
-  left: 0;
+  transform: translateX(0); /* Schiebt das Menü ins Bild */
+  opacity: 1; /* Sichtbar machen */
 }
 
 /* Stil für die Labels und Eingabefelder */

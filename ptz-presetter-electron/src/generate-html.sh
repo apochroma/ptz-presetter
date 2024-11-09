@@ -17,13 +17,11 @@ cat <<EOF > $output_file
 <body>
   <h1>PTZ Presetter</h1>
 
-  <!-- Zahnrad-Button für Einstellungen oben links -->
-  <button id="settings-btn" onclick="toggleSettings()">⚙️</button>
+  <!-- Umschalt-Icon für das Einstellungsmenü -->
+  <button id="toggle-settings-btn" onclick="toggleSettings()">></button>
 
-  <!-- Einstellungs-Sektion, die über den Kamera-Sektionen angezeigt wird -->
+  <!-- Einstellungs-Sektion -->
   <div id="settings-section" class="settings-section">
-    <!-- Schließen-Button für das Einstellungsmenü oben links -->
-    <button id="close-settings-btn" onclick="toggleSettings()">✖️</button>
     <h2>Einstellungen</h2>
     <label for="cam1-ip">Cam 1 IP:</label>
     <input type="text" id="cam1-ip" value="10.10.10.100">
@@ -74,17 +72,10 @@ for camera_number in {1..3}; do
   generate_camera_block $camera_number
 done
 
-# HTML-Ende mit JavaScript für das Einstellungsmenü und Schließen-Button
+# HTML-Ende mit nur dem externen JavaScript-Import
 cat <<EOF >> $output_file
   </div>
   <script src="renderer.js"></script>
-  <script>
-    // Toggle-Funktion für das Einstellungsmenü
-    function toggleSettings() {
-      const settingsSection = document.getElementById('settings-section');
-      settingsSection.classList.toggle('visible');
-    }
-  </script>
 </body>
 </html>
 EOF
