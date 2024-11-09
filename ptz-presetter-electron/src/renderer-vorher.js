@@ -1,13 +1,7 @@
-const fs = require('fs');
-const path = require('path');
-
-const settingsFilePath = path.join(__dirname, 'camera_settings.json');
-
 let cameraCount = 3;
 const cameraSettingsContainer = document.getElementById("camera-settings");
 const cameraContainer = document.getElementById("camera-container");
 
-// Funktion zum Umschalten des Einstellungsmenüs
 function toggleSettings() {
   const settingsSection = document.getElementById('settings-section');
   const toggleButton = document.getElementById('toggle-settings-btn');
@@ -15,7 +9,6 @@ function toggleSettings() {
   toggleButton.classList.toggle('rotate');
 }
 
-// Funktion zum Hinzufügen eines Kamera-IP-Feldes
 function addCameraField() {
   cameraCount++;
   const newCameraField = document.createElement("div");
@@ -29,7 +22,6 @@ function addCameraField() {
   cameraSettingsContainer.appendChild(newCameraField);
 }
 
-// Funktion zum Entfernen eines Kamera-IP-Feldes
 function removeCameraField(id) {
   if (id > 3) {
     const field = document.getElementById(`cam${id}-ip`).parentNode;
@@ -38,7 +30,6 @@ function removeCameraField(id) {
   }
 }
 
-// Funktion zum Speichern der Einstellungen in einer JSON-Datei
 function saveSettings() {
   const cameras = [];
   for (let i = 1; i <= cameraCount; i++) {
@@ -48,51 +39,15 @@ function saveSettings() {
     }
   }
   const settings = { cameras };
-  const settingsJSON = JSON.stringify(settings, null, 2);
+  const settingsJSON = JSON.stringify(settings);
 
-  fs.writeFile(settingsFilePath, settingsJSON, (err) => {
-    if (err) {
-      console.error('Fehler beim Speichern der Einstellungen:', err);
-    } else {
-      console.log('Einstellungen erfolgreich gespeichert.');
-    }
-  });
+  // Zum Speichern in einer Datei
+  // Für eine Node.js App könnte fs.writeFileSync genutzt werden, hier ist es simuliert
+  console.log("Settings gespeichert:", settingsJSON);
 
   updateCameraBlocks(cameras);
 }
 
-// Funktion zum Laden der Einstellungen aus einer JSON-Datei
-function loadSettings() {
-  if (fs.existsSync(settingsFilePath)) {
-    fs.readFile(settingsFilePath, 'utf8', (err, data) => {
-      if (err) {
-        console.error('Fehler beim Laden der Einstellungen:', err);
-      } else {
-        const settings = JSON.parse(data);
-        cameraCount = settings.cameras.length;
-
-        // Vorherige Felder löschen
-        cameraSettingsContainer.innerHTML = '';
-        
-        settings.cameras.forEach((camera, index) => {
-          const cameraField = document.createElement("div");
-          cameraField.innerHTML = `
-            <label for="cam${camera.id}-ip">Cam ${camera.id} IP:</label>
-            <input type="text" id="cam${camera.id}-ip" value="${camera.ip}">
-            ${index >= 2 ? `<button onclick="addCameraField()">+</button>` : ''}
-            ${index >= 3 ? `<button onclick="removeCameraField(${camera.id})">-</button>` : ''}
-            <br>
-          `;
-          cameraSettingsContainer.appendChild(cameraField);
-        });
-
-        updateCameraBlocks(settings.cameras);
-      }
-    });
-  }
-}
-
-// Funktion zum Erstellen und Anzeigen der Kamera-Blöcke im Hauptfenster
 function updateCameraBlocks(cameras) {
   cameraContainer.innerHTML = ""; // Lösche vorhandene Blöcke
   cameras.forEach(camera => {
@@ -121,20 +76,14 @@ function updateCameraBlocks(cameras) {
   });
 }
 
-// Funktion zum Abspielen eines Presets
 function playPreset(cameraNumber, presetNumber) {
   console.log(`Playing preset ${presetNumber} for camera ${cameraNumber}`);
 }
 
-// Funktion zum Speichern eines Presets
 function savePreset(cameraNumber, presetNumber) {
   console.log(`Saving preset ${presetNumber} for camera ${cameraNumber}`);
 }
 
-// Funktion zum Löschen eines Presets
 function deletePreset(cameraNumber, presetNumber) {
   console.log(`Deleting preset ${presetNumber} for camera ${cameraNumber}`);
 }
-
-// Lädt die Einstellungen, wenn die Seite geladen wird
-window.onload = loadSettings;

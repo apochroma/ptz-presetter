@@ -84,3 +84,15 @@
 .settings-section button:active {
   transform: scale(0.98);
 }
+
+/* Zusätzliche Buttons für + und - */
+.settings-section button {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 10px;
+}
+
+.settings-section .camera-settings-buttons button {
+  margin-left: 5px;
+}
+

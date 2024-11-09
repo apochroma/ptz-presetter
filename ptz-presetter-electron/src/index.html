@@ -10,24 +10,30 @@
 <body>
   <h1>PTZ Presetter</h1>
 
-  <!-- Umschalt-Icon für das Einstellungsmenü -->
   <button id="toggle-settings-btn" onclick="toggleSettings()">></button>
 
-  <!-- Einstellungs-Sektion -->
   <div id="settings-section" class="settings-section">
     <h2>Einstellungen</h2>
-    <label for="cam1-ip">Cam 1 IP:</label>
-    <input type="text" id="cam1-ip" value="10.10.10.100">
-    <br>
-    <label for="cam2-ip">Cam 2 IP:</label>
-    <input type="text" id="cam2-ip" value="10.10.10.101">
-    <br>
-    <label for="cam3-ip">Cam 3 IP:</label>
-    <input type="text" id="cam3-ip" value="10.10.10.102">
-    <br>
+    <div id="camera-settings">
+      <label for="cam1-ip">Cam 1 IP:</label>
+      <input type="text" id="cam1-ip" value="10.10.10.100">
+      <br>
+      <label for="cam2-ip">Cam 2 IP:</label>
+      <input type="text" id="cam2-ip" value="10.10.10.101">
+      <br>
+      <label for="cam3-ip">Cam 3 IP:</label>
+      <input type="text" id="cam3-ip" value="10.10.10.102">
+      <button onclick="addCameraField()">+</button>
+      <br>
+    </div>
     <button onclick="saveSettings()">Speichern</button>
   </div>
 
+  <div id="camera-container"></div>
+
+  <script src="renderer.js"></script>
+
+<!--
   <div id="camera-container">
     <div class='camera-block'>
       <div class='camera-title'>Cam 1</div>
@@ -405,6 +411,6 @@
       </div>
     </div>
   </div>
-  <script src="renderer.js"></script>
+  <script src="renderer.js"></script>-->
 </body>
 </html>
