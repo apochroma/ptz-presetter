@@ -113,7 +113,29 @@ function updateCameraBlocks(cameras) {
 
 // Funktion zum Abspielen eines Presets
 function playPreset(cameraNumber, presetNumber) {
-  console.log(`Playing preset ${presetNumber} for camera ${cameraNumber}`);
+  // Hole die IP-Adresse des gewünschten Kamera-Felds anhand der ID
+  const ipField = document.getElementById(`cam${cameraNumber}-ip`);
+  if (!ipField) {
+    console.error(`IP-Adresse für Kamera ${cameraNumber} nicht gefunden`);
+    return;
+  }
+
+  const cameraIP = ipField.value;
+  const url = `http://${cameraIP}/-wvhttp-01-/control.cgi?p=${presetNumber}`;
+
+  console.log(`Playing preset ${presetNumber} for camera ${cameraNumber} at ${url}`);
+
+  // Sende den HTTP-Request an die Kamera-IP, um das Preset abzurufen
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Fehler beim Abrufen des Presets: ${response.statusText}`);
+      }
+      console.log(`Preset ${presetNumber} erfolgreich aufgerufen für Kamera ${cameraNumber}`);
+    })
+    .catch(error => {
+      console.error(`Fehler beim Aufrufen des Presets: ${error}`);
+    });
 }
 
 // Funktion zum Speichern eines Presets
