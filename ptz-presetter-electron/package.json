@@ -12,5 +12,10 @@
   "devDependencies": {
     "electron": "^33.2.0",
     "electron-packager": "^17.1.2"
+  },
+  "dependencies": {
+    "boolean": "^3.2.0",
+    "glob": "^11.0.0",
+    "inflight": "^1.0.6"
   }
 }
