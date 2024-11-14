@@ -138,10 +138,33 @@ function playPreset(cameraNumber, presetNumber) {
     });
 }
 
-// Funktion zum Speichern eines Presets
+// Funktion zum Sichern eines Presets
 function savePreset(cameraNumber, presetNumber) {
-  console.log(`Saving preset ${presetNumber} for camera ${cameraNumber}`);
+  // Hole die IP-Adresse des gewünschten Kamera-Felds anhand der ID
+  const ipField = document.getElementById(`cam${cameraNumber}-ip`);
+  if (!ipField) {
+    console.error(`IP-Adresse für Kamera ${cameraNumber} nicht gefunden`);
+    return;
+  }
+
+  const cameraIP = ipField.value;
+  const url = `http://${cameraIP}/-wvhttp-01-/preset/set?&p=${presetNumber}&name=${presetNumber}&all=enabled`;
+
+  console.log(`Saving preset ${presetNumber} for camera ${cameraNumber} at ${url}`);
+
+  // Sende den HTTP-Request an die Kamera-IP, um das Preset zu speichern
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Fehler beim Speichern des Presets: ${response.statusText}`);
+      }
+      console.log(`Preset ${presetNumber} erfolgreich gespeichert für Kamera ${cameraNumber}`);
+    })
+    .catch(error => {
+      console.error(`Fehler beim Speichern des Presets: ${error}`);
+    });
 }
+
 
 // Funktion zum Löschen eines Presets
 function deletePreset(cameraNumber, presetNumber) {

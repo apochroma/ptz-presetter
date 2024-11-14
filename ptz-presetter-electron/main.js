@@ -16,6 +16,23 @@ ipcMain.handle('save-settings', async (event, settings) => {
   }
 });
 
+ipcMain.handle('save-image', async (event, { buffer, cameraNumber, presetNumber }) => {
+  try {
+    // Speicherpfad für das Bild im Application Support-Verzeichnis
+    const imageDir = path.join(app.getPath('userData'), 'images');
+    if (!fs.existsSync(imageDir)) {
+      fs.mkdirSync(imageDir, { recursive: true });
+    }
+
+    const imagePath = path.join(imageDir, `camera${cameraNumber}_preset${presetNumber}.jpg`);
+    fs.writeFileSync(imagePath, Buffer.from(buffer));
+    return `Bild erfolgreich gespeichert unter ${imagePath}`;
+  } catch (error) {
+    throw new Error(`Fehler beim Speichern des Bildes: ${error.message}`);
+  }
+});
+
+
 // IPC-Handler zum Laden der Einstellungen
 ipcMain.handle('load-settings', async () => {
   const settingsPath = path.join(app.getPath('userData'), 'camera_settings.json');
