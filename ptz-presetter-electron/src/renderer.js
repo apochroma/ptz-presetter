@@ -53,24 +53,33 @@ async function updateCameraBlocks(cameras) {
   });
 }
 
-
-
-
-
-
 // Funktion zum Speichern der Einstellungen
 async function saveSettings() {
-  const cameras = [];
+  // Bestehende Einstellungen laden
+  const settings = await window.electron.loadSettings() || { cameras: [] };
+
+  // Aktualisiere oder füge Kameras hinzu, ohne Preset-Daten zu überschreiben
   for (let i = 1; i <= cameraCount; i++) {
     const ipField = document.getElementById(`cam${i}-ip`);
     if (ipField) {
-      cameras.push({ id: i, ip: ipField.value });
+      const cameraIP = ipField.value;
+      let camera = settings.cameras.find(c => c.id === i);
+
+      if (camera) {
+        // Falls die Kamera bereits existiert, nur die IP-Adresse aktualisieren
+        camera.ip = cameraIP;
+      } else {
+        // Falls die Kamera neu ist, hinzufügen
+        settings.cameras.push({ id: i, ip: cameraIP, presets: {} });
+      }
     }
   }
-  const settings = { cameras };
+
+  // Speichere die aktualisierten Einstellungen
   const response = await window.electron.saveSettings(settings);
   console.log(response);
 }
+
 
 // Funktion zum Laden der Einstellungen
 async function loadSettings() {
@@ -163,14 +172,12 @@ async function savePreset(cameraNumber, presetNumber) {
   console.log(`Saving preset ${presetNumber} for camera ${cameraNumber} at ${presetUrl}`);
 
   try {
-    // Preset auf der Kamera speichern
     const presetResponse = await fetch(presetUrl);
     if (!presetResponse.ok) {
       throw new Error(`Fehler beim Speichern des Presets: ${presetResponse.statusText}`);
     }
     console.log(`Preset ${presetNumber} erfolgreich gespeichert für Kamera ${cameraNumber}`);
 
-    // Kamerabild abrufen
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(`Fehler beim Abrufen des Kamerabilds: ${imageResponse.statusText}`);
@@ -179,22 +186,34 @@ async function savePreset(cameraNumber, presetNumber) {
     const reader = new FileReader();
     reader.onload = async function() {
       const imageData = reader.result.split(',')[1];
-      const appDataPath = await window.electron.getUserDataPath(); // Auf das Resultat warten
+      const appDataPath = await window.electron.getUserDataPath();
       const imagePath = `${appDataPath}/preset-images/camera_${cameraNumber}_preset_${presetNumber}.jpg`;
       
       await window.electron.saveCameraImage(cameraNumber, presetNumber, imageData);
 
-      // JSON-Datei aktualisieren und Pfad speichern
+      // JSON laden und bestehende Struktur beibehalten
       const settings = await window.electron.loadSettings();
-      if (!settings.cameras[cameraNumber - 1].presets) {
-        settings.cameras[cameraNumber - 1].presets = {};
+      if (!settings.cameras) settings.cameras = [];
+      
+      // Prüfen, ob Kamera bereits existiert, andernfalls hinzufügen
+      let camera = settings.cameras.find(c => c.id === cameraNumber);
+      if (!camera) {
+        camera = { id: cameraNumber, ip: cameraIP, presets: {} };
+        settings.cameras.push(camera);
+      } else {
+        camera.ip = cameraIP; // IP-Adresse aktualisieren, falls geändert
       }
-      settings.cameras[cameraNumber - 1].presets[presetNumber] = { imagePath: imagePath };
+
+      // Preset-Daten hinzufügen oder aktualisieren
+      if (!camera.presets) camera.presets = {};
+      camera.presets[presetNumber] = { imagePath: imagePath };
+
+      // Einstellungen speichern
       await window.electron.saveSettings(settings);
       console.log(`Preset-Informationen für Kamera ${cameraNumber}, Preset ${presetNumber} wurden mit Bildpfad aktualisiert.`);
 
-      // Aktualisiere die Anzeige
-      updateCameraBlocks(settings.cameras); // Seite nach dem Speichern neu laden
+      // Anzeige aktualisieren
+      updateCameraBlocks(settings.cameras);
     };
     reader.readAsDataURL(blob);
   } catch (error) {
@@ -230,6 +249,9 @@ async function deletePreset(cameraNumber, presetNumber) {
       delete settings.cameras[cameraNumber - 1].presets[presetNumber];
       await window.electron.saveSettings(settings);
       console.log(`Preset-Informationen für Kamera ${cameraNumber}, Preset ${presetNumber} wurden gelöscht.`);
+
+      // Bilddatei löschen
+      await window.electron.deleteCameraImage(cameraNumber, presetNumber);
 
       // Aktualisiere die Anzeige
       updateCameraBlocks(settings.cameras); // Seite nach dem Löschen neu laden

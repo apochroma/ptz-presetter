@@ -6,5 +6,7 @@ contextBridge.exposeInMainWorld('electron', {
   loadSettings: () => ipcRenderer.invoke('load-settings'),
   saveCameraImage: (cameraNumber, presetNumber, imageData) => 
     ipcRenderer.invoke('save-camera-image', cameraNumber, presetNumber, imageData),
-  getPresetImages: () => ipcRenderer.invoke('get-preset-images')
+  getPresetImages: () => ipcRenderer.invoke('get-preset-images'),
+  deleteCameraImage: (cameraNumber, presetNumber) => 
+    ipcRenderer.invoke('delete-camera-image', cameraNumber, presetNumber)
 });

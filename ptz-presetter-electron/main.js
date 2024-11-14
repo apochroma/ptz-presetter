@@ -22,6 +22,22 @@ ipcMain.handle('save-camera-image', async (event, cameraNumber, presetNumber, im
   }
 });
 
+// Löschen des Kamerabildes im Unterordner `preset-images`
+ipcMain.handle('delete-camera-image', async (event, cameraNumber, presetNumber) => {
+  const appDataPath = app.getPath('userData');
+  const imagePath = path.join(appDataPath, `preset-images/camera_${cameraNumber}_preset_${presetNumber}.jpg`);
+
+  try {
+    if (fs.existsSync(imagePath)) {
+      await fs.promises.unlink(imagePath); // Bilddatei löschen
+      console.log(`Kamerabild für Kamera ${cameraNumber}, Preset ${presetNumber} wurde gelöscht.`);
+    }
+  } catch (error) {
+    console.error(`Fehler beim Löschen des Kamerabilds: ${error.message}`);
+  }
+});
+
+
 ipcMain.handle('get-preset-images', async () => {
   const appDataPath = app.getPath('userData');
   const imageDir = path.join(appDataPath, 'preset-images');
