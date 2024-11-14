@@ -1,8 +1,4 @@
-const fs = window.electron.fs;
-const path = window.electron.path;
-
 let appDataPath;
-let settingsFilePath;
 let cameraCount = 3; // Variable für die Anzahl der Kameras
 let cameraSettingsContainer;
 let cameraContainer;
@@ -22,19 +18,8 @@ function toggleSettings() {
   }
 }
 
-// Den `userData`-Pfad vom Main-Prozess abrufen und Einstellungen initialisieren
-async function initializePaths() {
-  appDataPath = await window.electron.getUserDataPath();
-  settingsFilePath = path.join(appDataPath, 'camera_settings.json');
-  console.log('App Data Path:', appDataPath); // <-- Hier eingefügt
-  loadSettings(); // Laden der Einstellungen
-}
-
-// Funktion zum Speichern der Einstellungen in einer JSON-Datei
-function saveSettings() {
-  console.log('Speichern wird ausgeführt');
-  console.log('cameraCount:', cameraCount);
-
+// Funktion zum Speichern der Einstellungen
+async function saveSettings() {
   const cameras = [];
   for (let i = 1; i <= cameraCount; i++) {
     const ipField = document.getElementById(`cam${i}-ip`);
@@ -42,65 +27,36 @@ function saveSettings() {
       cameras.push({ id: i, ip: ipField.value });
     }
   }
-
   const settings = { cameras };
-  const settingsJSON = JSON.stringify(settings, null, 2);
-
-  if (!fs.existsSync(appDataPath)) {
-    fs.mkdirSync(appDataPath, { recursive: true });
-  }
-
-  fs.writeFile(settingsFilePath, settingsJSON, (err) => {
-    if (err) {
-      console.error('Fehler beim Speichern der Einstellungen:', err);
-    } else {
-      console.log('Einstellungen erfolgreich gespeichert.');
-    }
-  });
+  const response = await window.electron.saveSettings(settings);
+  console.log(response);
 }
 
-// Funktion zum Laden der Einstellungen aus einer JSON-Datei
-function loadSettings() {
-  if (!fs.existsSync(appDataPath)) {
-    fs.mkdirSync(appDataPath, { recursive: true });
+// Funktion zum Laden der Einstellungen
+async function loadSettings() {
+  const settings = await window.electron.loadSettings();
+  if (settings) {
+    console.log('Einstellungen erfolgreich geladen:', settings);
+    cameraCount = settings.cameras.length;
+
+    // Setze die Kamera-IP-Felder basierend auf den geladenen Einstellungen
+    cameraSettingsContainer.innerHTML = '';
+    settings.cameras.forEach((camera, index) => {
+      const cameraField = document.createElement("div");
+      cameraField.innerHTML = `
+        <label for="cam${camera.id}-ip">Cam ${camera.id} IP:</label>
+        <input type="text" id="cam${camera.id}-ip" value="${camera.ip}">
+        ${index >= 2 ? `<button onclick="addCameraField()">+</button>` : ''}
+        ${index >= 3 ? `<button onclick="removeCameraField(${camera.id})">-</button>` : ''}
+        <br>
+      `;
+      cameraSettingsContainer.appendChild(cameraField);
+    });
+
+    updateCameraBlocks(settings.cameras);
+  } else {
+    console.log("Keine Einstellungen gefunden, Standardwerte verwenden.");
   }
-
-  if (!fs.existsSync(settingsFilePath)) {
-    const defaultSettings = {
-      cameras: [
-        { id: 1, ip: "10.10.10.100" },
-        { id: 2, ip: "10.10.10.101" },
-        { id: 3, ip: "10.10.10.102" }
-      ]
-    };
-    console.log('Creating Default Settings File:', settingsFilePath);
-    fs.writeFileSync(settingsFilePath, JSON.stringify(defaultSettings, null, 2));
-  }
-
-  fs.readFile(settingsFilePath, 'utf8', (err, data) => {
-    if (err) {
-      console.error('Fehler beim Laden der Einstellungen:', err);
-    } else {
-      const settings = JSON.parse(data);
-      cameraCount = settings.cameras.length;
-
-      cameraSettingsContainer.innerHTML = '';
-      
-      settings.cameras.forEach((camera, index) => {
-        const cameraField = document.createElement("div");
-        cameraField.innerHTML = `
-          <label for="cam${camera.id}-ip">Cam ${camera.id} IP:</label>
-          <input type="text" id="cam${camera.id}-ip" value="${camera.ip}">
-          ${index >= 2 ? `<button onclick="addCameraField()">+</button>` : ''}
-          ${index >= 3 ? `<button onclick="removeCameraField(${camera.id})">-</button>` : ''}
-          <br>
-        `;
-        cameraSettingsContainer.appendChild(cameraField);
-      });
-
-      updateCameraBlocks(settings.cameras);
-    }
-  });
 }
 
 // Funktion zum Hinzufügen eines neuen Kamera-IP-Feldes
@@ -174,11 +130,18 @@ function deletePreset(cameraNumber, presetNumber) {
 document.addEventListener('DOMContentLoaded', () => {
   cameraSettingsContainer = document.getElementById("camera-settings");
   cameraContainer = document.getElementById("camera-container");
-  console.log('Camera Container:', cameraContainer); // Optional für weitere Debug-Infos
 
-  // Speicher-Button-Event hinzufügen, nachdem DOM geladen ist
-  document.getElementById('save-button').addEventListener('click', saveSettings);
+  if (!cameraContainer) {
+    console.error('camera-container Element nicht gefunden');
+    return;
+  }
 
-  initializePaths();
-  console.log('App Data Path:', appDataPath); // Falls Debugging in der Hauptfunktion notwendig ist
+  const saveButton = document.getElementById('save-button');
+  if (!saveButton) {
+    console.error('save-button Element nicht gefunden');
+  } else {
+    saveButton.addEventListener('click', saveSettings);
+  }
+
+  loadSettings(); // Einstellungen beim Laden abrufen
 });
