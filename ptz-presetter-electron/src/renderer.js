@@ -138,9 +138,7 @@ function playPreset(cameraNumber, presetNumber) {
     });
 }
 
-// Funktion zum Sichern eines Presets
 function savePreset(cameraNumber, presetNumber) {
-  // Hole die IP-Adresse des gewünschten Kamera-Felds anhand der ID
   const ipField = document.getElementById(`cam${cameraNumber}-ip`);
   if (!ipField) {
     console.error(`IP-Adresse für Kamera ${cameraNumber} nicht gefunden`);
@@ -148,20 +146,39 @@ function savePreset(cameraNumber, presetNumber) {
   }
 
   const cameraIP = ipField.value;
-  const url = `http://${cameraIP}/-wvhttp-01-/preset/set?&p=${presetNumber}&name=${presetNumber}&all=enabled`;
+  const presetUrl = `http://${cameraIP}/-wvhttp-01-/preset/set?&p=${presetNumber}&name=${presetNumber}&all=enabled`;
+  const imageUrl = `http://${cameraIP}/-wvhttp-01-/image.cgi`;
 
-  console.log(`Saving preset ${presetNumber} for camera ${cameraNumber} at ${url}`);
+  console.log(`Saving preset ${presetNumber} for camera ${cameraNumber} at ${presetUrl}`);
 
-  // Sende den HTTP-Request an die Kamera-IP, um das Preset zu speichern
-  fetch(url)
+  // Preset auf der Kamera speichern
+  fetch(presetUrl)
     .then(response => {
       if (!response.ok) {
         throw new Error(`Fehler beim Speichern des Presets: ${response.statusText}`);
       }
       console.log(`Preset ${presetNumber} erfolgreich gespeichert für Kamera ${cameraNumber}`);
+
+      // Kamerabild abrufen
+      return fetch(imageUrl);
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Fehler beim Abrufen des Kamerabilds: ${response.statusText}`);
+      }
+      return response.blob(); // Bild als Blob abrufen
+    })
+    .then(blob => {
+      // Bildinhalt an den Hauptprozess senden, um es zu speichern
+      const reader = new FileReader();
+      reader.onload = function() {
+        const imageData = reader.result.split(',')[1]; // Nur den Base64-Inhalt nutzen
+        window.electron.saveCameraImage(cameraNumber, presetNumber, imageData);
+      };
+      reader.readAsDataURL(blob);
     })
     .catch(error => {
-      console.error(`Fehler beim Speichern des Presets: ${error}`);
+      console.error(`Fehler beim Speichern des Presets oder Bildabruf: ${error}`);
     });
 }
 

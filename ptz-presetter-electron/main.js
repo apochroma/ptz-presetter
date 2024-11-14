@@ -2,6 +2,26 @@ const { app, BrowserWindow, ipcMain, session } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
+// Speichern des Kamerabildes im Unterordner `preset-images`
+ipcMain.handle('save-camera-image', async (event, cameraNumber, presetNumber, imageData) => {
+  const appDataPath = app.getPath('userData');
+  const imageDir = path.join(appDataPath, 'preset-images'); // Unterordner `preset-images` erstellen
+  const filePath = path.join(imageDir, `camera_${cameraNumber}_preset_${presetNumber}.jpg`);
+
+  try {
+    // Prüfen, ob der Ordner `preset-images` existiert, und ihn bei Bedarf erstellen
+    if (!fs.existsSync(imageDir)) {
+      fs.mkdirSync(imageDir, { recursive: true });
+    }
+
+    const buffer = Buffer.from(imageData, 'base64');
+    await fs.promises.writeFile(filePath, buffer);
+    console.log(`Kamerabild für Kamera ${cameraNumber}, Preset ${presetNumber} erfolgreich gespeichert unter ${filePath}`);
+  } catch (error) {
+    console.error(`Fehler beim Speichern des Kamerabilds: ${error.message}`);
+  }
+});
+
 // IPC-Handler, um den `userData`-Pfad zu erhalten
 ipcMain.handle('getUserDataPath', () => app.getPath('userData'));
 
@@ -15,23 +35,6 @@ ipcMain.handle('save-settings', async (event, settings) => {
     return `Fehler beim Speichern: ${err.message}`;
   }
 });
-
-ipcMain.handle('save-image', async (event, { buffer, cameraNumber, presetNumber }) => {
-  try {
-    // Speicherpfad für das Bild im Application Support-Verzeichnis
-    const imageDir = path.join(app.getPath('userData'), 'images');
-    if (!fs.existsSync(imageDir)) {
-      fs.mkdirSync(imageDir, { recursive: true });
-    }
-
-    const imagePath = path.join(imageDir, `camera${cameraNumber}_preset${presetNumber}.jpg`);
-    fs.writeFileSync(imagePath, Buffer.from(buffer));
-    return `Bild erfolgreich gespeichert unter ${imagePath}`;
-  } catch (error) {
-    throw new Error(`Fehler beim Speichern des Bildes: ${error.message}`);
-  }
-});
-
 
 // IPC-Handler zum Laden der Einstellungen
 ipcMain.handle('load-settings', async () => {
