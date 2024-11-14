@@ -168,7 +168,29 @@ function savePreset(cameraNumber, presetNumber) {
 
 // Funktion zum Löschen eines Presets
 function deletePreset(cameraNumber, presetNumber) {
-  console.log(`Deleting preset ${presetNumber} for camera ${cameraNumber}`);
+  // Hole die IP-Adresse des gewünschten Kamera-Felds anhand der ID
+  const ipField = document.getElementById(`cam${cameraNumber}-ip`);
+  if (!ipField) {
+    console.error(`IP-Adresse für Kamera ${cameraNumber} nicht gefunden`);
+    return;
+  }
+
+  const cameraIP = ipField.value;
+  const url = `http://${cameraIP}/-wvhttp-01-/preset/set?&p=${presetNumber}&name=&ptz=disabled`;
+
+  console.log(`Deleting preset ${presetNumber} for camera ${cameraNumber} at ${url}`);
+
+  // Sende den HTTP-Request an die Kamera-IP, um das Preset zu löschen
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Fehler beim Löschen des Presets: ${response.statusText}`);
+      }
+      console.log(`Preset ${presetNumber} erfolgreich gelöscht für Kamera ${cameraNumber}`);
+    })
+    .catch(error => {
+      console.error(`Fehler beim Löschen des Presets: ${error}`);
+    });
 }
 
 // Initialisieren und Pfade festlegen, sobald das DOM vollständig geladen ist
