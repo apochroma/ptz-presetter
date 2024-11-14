@@ -192,6 +192,9 @@ async function savePreset(cameraNumber, presetNumber) {
       settings.cameras[cameraNumber - 1].presets[presetNumber] = { imagePath: imagePath };
       await window.electron.saveSettings(settings);
       console.log(`Preset-Informationen für Kamera ${cameraNumber}, Preset ${presetNumber} wurden mit Bildpfad aktualisiert.`);
+
+      // Aktualisiere die Anzeige
+      updateCameraBlocks(settings.cameras); // Seite nach dem Speichern neu laden
     };
     reader.readAsDataURL(blob);
   } catch (error) {
@@ -202,8 +205,7 @@ async function savePreset(cameraNumber, presetNumber) {
 
 
 // Funktion zum Löschen eines Presets
-function deletePreset(cameraNumber, presetNumber) {
-  // Hole die IP-Adresse des gewünschten Kamera-Felds anhand der ID
+async function deletePreset(cameraNumber, presetNumber) {
   const ipField = document.getElementById(`cam${cameraNumber}-ip`);
   if (!ipField) {
     console.error(`IP-Adresse für Kamera ${cameraNumber} nicht gefunden`);
@@ -211,21 +213,30 @@ function deletePreset(cameraNumber, presetNumber) {
   }
 
   const cameraIP = ipField.value;
-  const url = `http://${cameraIP}/-wvhttp-01-/preset/set?&p=${presetNumber}&name=&ptz=disabled`;
+  const deleteUrl = `http://${cameraIP}/-wvhttp-01-/preset/set?&p=${presetNumber}&name=&ptz=disabled`;
 
-  console.log(`Deleting preset ${presetNumber} for camera ${cameraNumber} at ${url}`);
+  console.log(`Deleting preset ${presetNumber} for camera ${cameraNumber} at ${deleteUrl}`);
 
-  // Sende den HTTP-Request an die Kamera-IP, um das Preset zu löschen
-  fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Fehler beim Löschen des Presets: ${response.statusText}`);
-      }
-      console.log(`Preset ${presetNumber} erfolgreich gelöscht für Kamera ${cameraNumber}`);
-    })
-    .catch(error => {
-      console.error(`Fehler beim Löschen des Presets: ${error}`);
-    });
+  try {
+    const response = await fetch(deleteUrl);
+    if (!response.ok) {
+      throw new Error(`Fehler beim Löschen des Presets: ${response.statusText}`);
+    }
+    console.log(`Preset ${presetNumber} erfolgreich gelöscht für Kamera ${cameraNumber}`);
+
+    // Aktualisiere JSON, um das gelöschte Preset zu entfernen
+    const settings = await window.electron.loadSettings();
+    if (settings.cameras[cameraNumber - 1]?.presets?.[presetNumber]) {
+      delete settings.cameras[cameraNumber - 1].presets[presetNumber];
+      await window.electron.saveSettings(settings);
+      console.log(`Preset-Informationen für Kamera ${cameraNumber}, Preset ${presetNumber} wurden gelöscht.`);
+
+      // Aktualisiere die Anzeige
+      updateCameraBlocks(settings.cameras); // Seite nach dem Löschen neu laden
+    }
+  } catch (error) {
+    console.error(`Fehler beim Löschen des Presets: ${error}`);
+  }
 }
 
 // Initialisieren und Pfade festlegen, sobald das DOM vollständig geladen ist
