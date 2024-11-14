@@ -22,6 +22,33 @@ ipcMain.handle('save-camera-image', async (event, cameraNumber, presetNumber, im
   }
 });
 
+ipcMain.handle('get-preset-images', async () => {
+  const appDataPath = app.getPath('userData');
+  const imageDir = path.join(appDataPath, 'preset-images');
+  const images = {};
+
+  try {
+    // Überprüfen, ob der Ordner existiert
+    if (fs.existsSync(imageDir)) {
+      const files = await fs.promises.readdir(imageDir);
+      files.forEach(file => {
+        const match = file.match(/camera_(\d+)_preset_(\d+)\.jpg/);
+        if (match) {
+          const cameraNumber = parseInt(match[1], 10);
+          const presetNumber = parseInt(match[2], 10);
+          if (!images[cameraNumber]) images[cameraNumber] = {};
+          images[cameraNumber][presetNumber] = path.join(imageDir, file);
+        }
+      });
+    }
+  } catch (error) {
+    console.error(`Fehler beim Analysieren des Ordners preset-images: ${error.message}`);
+  }
+  
+  return images; // Rückgabe eines Objekts mit Kamera- und Preset-Nummern als Schlüssel
+});
+
+
 // IPC-Handler, um den `userData`-Pfad zu erhalten
 ipcMain.handle('getUserDataPath', () => app.getPath('userData'));
 

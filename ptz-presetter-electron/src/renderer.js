@@ -18,6 +18,46 @@ function toggleSettings() {
   }
 }
 
+// Preset Bilder aktualisieren
+async function updateCameraBlocks(cameras) {
+  const settings = await window.electron.loadSettings();
+
+  cameraContainer.innerHTML = ""; // Vorhandene Blöcke löschen
+  cameras.forEach(camera => {
+    const cameraBlock = document.createElement("div");
+    cameraBlock.classList.add("camera-block");
+    cameraBlock.innerHTML = `
+      <div class="camera-title">Cam ${camera.id}</div>
+      <div class="presets">
+        ${Array.from({ length: 10 }).map((_, index) => {
+          const presetNumber = index + 1;
+          const imagePath = settings.cameras[camera.id - 1]?.presets?.[presetNumber]?.imagePath || 'images/empty.png';
+          return `
+            <div class="preset" data-preset="${presetNumber}">
+              <div class="thumbnail-container">
+                <a href="#" onclick="playPreset(${camera.id}, ${presetNumber})">
+                  <img class="thumbnail" id="cam${camera.id}-preset${presetNumber}" src="${imagePath}" alt="Preset ${presetNumber}">
+                  <span class="preset-label">Preset ${presetNumber}</span>
+                </a>
+                <div class="controls">
+                  <button onclick="savePreset(${camera.id}, ${presetNumber})">💾</button>
+                  <button onclick="deletePreset(${camera.id}, ${presetNumber})">🗑️</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+    cameraContainer.appendChild(cameraBlock);
+  });
+}
+
+
+
+
+
+
 // Funktion zum Speichern der Einstellungen
 async function saveSettings() {
   const cameras = [];
@@ -82,35 +122,6 @@ function removeCameraField(id) {
   }
 }
 
-// Funktion zur Aktualisierung der Kamera-Blöcke im Hauptfenster
-function updateCameraBlocks(cameras) {
-  cameraContainer.innerHTML = ""; // Vorhandene Blöcke löschen
-  cameras.forEach(camera => {
-    const cameraBlock = document.createElement("div");
-    cameraBlock.classList.add("camera-block");
-    cameraBlock.innerHTML = `
-      <div class="camera-title">Cam ${camera.id}</div>
-      <div class="presets">
-        ${Array.from({ length: 10 }).map((_, index) => `
-          <div class="preset" data-preset="${index + 1}">
-            <div class="thumbnail-container">
-              <a href="#" onclick="playPreset(${camera.id}, ${index + 1})">
-                <img class="thumbnail" id="cam${camera.id}-preset${index + 1}" src="images/empty.png" alt="Preset ${index + 1}">
-                <span class="preset-label">Preset ${index + 1}</span>
-              </a>
-              <div class="controls">
-                <button onclick="savePreset(${camera.id}, ${index + 1})">💾</button>
-                <button onclick="deletePreset(${camera.id}, ${index + 1})">🗑️</button>
-              </div>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    `;
-    cameraContainer.appendChild(cameraBlock);
-  });
-}
-
 // Funktion zum Abspielen eines Presets
 function playPreset(cameraNumber, presetNumber) {
   // Hole die IP-Adresse des gewünschten Kamera-Felds anhand der ID
@@ -138,7 +149,7 @@ function playPreset(cameraNumber, presetNumber) {
     });
 }
 
-function savePreset(cameraNumber, presetNumber) {
+async function savePreset(cameraNumber, presetNumber) {
   const ipField = document.getElementById(`cam${cameraNumber}-ip`);
   if (!ipField) {
     console.error(`IP-Adresse für Kamera ${cameraNumber} nicht gefunden`);
@@ -151,36 +162,43 @@ function savePreset(cameraNumber, presetNumber) {
 
   console.log(`Saving preset ${presetNumber} for camera ${cameraNumber} at ${presetUrl}`);
 
-  // Preset auf der Kamera speichern
-  fetch(presetUrl)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Fehler beim Speichern des Presets: ${response.statusText}`);
-      }
-      console.log(`Preset ${presetNumber} erfolgreich gespeichert für Kamera ${cameraNumber}`);
+  try {
+    // Preset auf der Kamera speichern
+    const presetResponse = await fetch(presetUrl);
+    if (!presetResponse.ok) {
+      throw new Error(`Fehler beim Speichern des Presets: ${presetResponse.statusText}`);
+    }
+    console.log(`Preset ${presetNumber} erfolgreich gespeichert für Kamera ${cameraNumber}`);
 
-      // Kamerabild abrufen
-      return fetch(imageUrl);
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Fehler beim Abrufen des Kamerabilds: ${response.statusText}`);
+    // Kamerabild abrufen
+    const imageResponse = await fetch(imageUrl);
+    if (!imageResponse.ok) {
+      throw new Error(`Fehler beim Abrufen des Kamerabilds: ${imageResponse.statusText}`);
+    }
+    const blob = await imageResponse.blob();
+    const reader = new FileReader();
+    reader.onload = async function() {
+      const imageData = reader.result.split(',')[1];
+      const appDataPath = await window.electron.getUserDataPath(); // Auf das Resultat warten
+      const imagePath = `${appDataPath}/preset-images/camera_${cameraNumber}_preset_${presetNumber}.jpg`;
+      
+      await window.electron.saveCameraImage(cameraNumber, presetNumber, imageData);
+
+      // JSON-Datei aktualisieren und Pfad speichern
+      const settings = await window.electron.loadSettings();
+      if (!settings.cameras[cameraNumber - 1].presets) {
+        settings.cameras[cameraNumber - 1].presets = {};
       }
-      return response.blob(); // Bild als Blob abrufen
-    })
-    .then(blob => {
-      // Bildinhalt an den Hauptprozess senden, um es zu speichern
-      const reader = new FileReader();
-      reader.onload = function() {
-        const imageData = reader.result.split(',')[1]; // Nur den Base64-Inhalt nutzen
-        window.electron.saveCameraImage(cameraNumber, presetNumber, imageData);
-      };
-      reader.readAsDataURL(blob);
-    })
-    .catch(error => {
-      console.error(`Fehler beim Speichern des Presets oder Bildabruf: ${error}`);
-    });
+      settings.cameras[cameraNumber - 1].presets[presetNumber] = { imagePath: imagePath };
+      await window.electron.saveSettings(settings);
+      console.log(`Preset-Informationen für Kamera ${cameraNumber}, Preset ${presetNumber} wurden mit Bildpfad aktualisiert.`);
+    };
+    reader.readAsDataURL(blob);
+  } catch (error) {
+    console.error(`Fehler beim Speichern des Presets oder Bildabruf: ${error}`);
+  }
 }
+
 
 
 // Funktion zum Löschen eines Presets
