@@ -122,3 +122,9 @@ h1 {
 .controls button:hover {
   background-color: #555;
 }
+
+/* Rahmen für das zuletzt ausgeführte Preset */
+.active-preset {
+  box-sizing: border-box; /* Damit der Rahmen nach innen geht und die Größe gleich bleibt */
+  border: 3px solid green;
+}

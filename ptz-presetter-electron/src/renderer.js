@@ -33,10 +33,10 @@ async function updateCameraBlocks(cameras) {
           const presetNumber = index + 1;
           const imagePath = settings.cameras[camera.id - 1]?.presets?.[presetNumber]?.imagePath || 'images/empty.png';
           return `
-            <div class="preset" data-preset="${presetNumber}">
+            <div class="preset" id="cam${camera.id}-preset${presetNumber}" data-preset="${presetNumber}">
               <div class="thumbnail-container">
                 <a href="#" onclick="playPreset(${camera.id}, ${presetNumber})">
-                  <img class="thumbnail" id="cam${camera.id}-preset${presetNumber}" src="${imagePath}" alt="Preset ${presetNumber}">
+                  <img class="thumbnail" src="${imagePath}" alt="Preset ${presetNumber}">
                   <span class="preset-label">Preset ${presetNumber}</span>
                 </a>
                 <div class="controls">
@@ -52,6 +52,7 @@ async function updateCameraBlocks(cameras) {
     cameraContainer.appendChild(cameraBlock);
   });
 }
+
 
 // Funktion zum Speichern der Einstellungen
 async function saveSettings() {
@@ -176,6 +177,10 @@ function removeCameraField(cameraId) {
 
 // Funktion zum Abspielen eines Presets
 function playPreset(cameraNumber, presetNumber) {
+
+  //Highlight active Preset
+  highlightPreset(cameraNumber, presetNumber);
+
   // Hole die IP-Adresse des gewünschten Kamera-Felds anhand der ID
   const ipField = document.getElementById(`cam${cameraNumber}-ip`);
   if (!ipField) {
@@ -323,3 +328,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loadSettings(); // Einstellungen beim Laden abrufen
 });
+
+
+// Funktion zum Hervorheben des zuletzt ausgeführten Presets
+function highlightPreset(cameraId, presetNumber) {
+  // Entferne die aktive Klasse von allen Presets der Kamera
+  const cameraPresets = document.querySelectorAll(`[id^="cam${cameraId}-preset"]`);
+  cameraPresets.forEach(preset => {
+    preset.classList.remove('active-preset');
+  });
+
+  // Füge die aktive Klasse zum ausgewählten Preset hinzu
+  const selectedPreset = document.querySelector(`#cam${cameraId}-preset${presetNumber}`);
+  if (selectedPreset) {
+    selectedPreset.classList.add('active-preset');
+  } else {
+    console.error(`Preset ${presetNumber} für Kamera ${cameraId} nicht gefunden`);
+  }
+}
