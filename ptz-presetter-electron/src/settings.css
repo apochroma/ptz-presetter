@@ -98,16 +98,17 @@
 
 /* Layout für eine Kamera-Reihe */
 .camera-row {
-  display: flex;
-  align-items: baseline; /* Vertikale Zentrierung der Elemente */
-  gap: 8px; /* Abstand zwischen den Elementen */
-  margin-bottom: 10px; /* Abstand zwischen den Kamera-Reihen */
+  display: grid;
+  grid-template-columns: auto 1fr auto auto; /* Spalten für Label, Eingabefeld, Minus- und Plus-Button */
+  align-items: baseline; /* Zentrierte Ausrichtung in jeder Zeile */
+  gap: 12px; /* Abstand zwischen den Spalten */
+  margin-bottom: 10px;
 }
 
-/* Eingabefeld für die IP-Adresse */
+/* Stil für das Eingabefeld */
 .camera-row .camera-input {
-  width: 200px; /* Breite für IP-Adresse */
-  height: 40px; /* Einheitliche Höhe */
+  width: 100%; /* Eingabefeld füllt die gesamte Spaltenbreite */
+  height: 40px;
   font-size: 14px;
   padding: 8px;
   text-align: center;
@@ -116,12 +117,21 @@
   border: 1px solid #555;
   border-radius: 4px;
   box-sizing: border-box;
+  margin: 0;
+}
+
+/* Stil für die Plus- und Minus-Buttons UNSICHTBAR */
+.camera-row .camera-btn, .button-placeholder {
+  width: 40px;
+  height: 40px;
+  background-color: transparent; /* Unsichtbarer Hintergrund für Platzhalter */
+  border: none; /* Keine Umrandung für Platzhalter */
 }
 
 /* Stil für die Plus- und Minus-Buttons */
 .camera-row .camera-btn {
-  width: 40px; /* Breite des Buttons */
-  height: 40px; /* Höhe passend zum Eingabefeld */
+  width: 40px;
+  height: 40px;
   font-size: 16px;
   font-weight: bold;
   background-color: #333;
@@ -133,8 +143,7 @@
   justify-content: center;
   cursor: pointer;
   box-sizing: border-box;
-  padding: 0; /* Kein Padding, um die Höhe exakt zu halten */
-  margin: 0; /* Keine zusätzliche Margin */
+  padding: 0;
 }
 
 .camera-row .camera-btn:hover {

@@ -55,31 +55,36 @@ async function updateCameraBlocks(cameras) {
 
 // Funktion zum Speichern der Einstellungen
 async function saveSettings() {
-  // Bestehende Einstellungen laden
+  // Bestehende Einstellungen laden oder neues Objekt erstellen
   const settings = await window.electron.loadSettings() || { cameras: [] };
 
   // Aktuelle Kamera-IDs und IPs aus der Settings-Sektion ermitteln
   const updatedCameras = [];
-  const visibleCameraCount = document.querySelectorAll("#camera-settings > div").length;
+  const cameraFields = document.querySelectorAll("#camera-settings > .camera-row");
 
-  for (let i = 1; i <= visibleCameraCount; i++) {
-    const ipField = document.getElementById(`cam${i}-ip`);
+  cameraFields.forEach((field, index) => {
+    const ipField = field.querySelector("input[type='text']");
     if (ipField) {
       const cameraIP = ipField.value;
-      let camera = settings.cameras.find(c => c.id === i);
+      const cameraId = index + 1; // ID basierend auf Position festlegen
+
+      // Suche die Kamera mit der aktuellen ID in den geladenen Einstellungen
+      let camera = settings.cameras.find(c => c.id === cameraId);
 
       if (camera) {
         // Falls die Kamera existiert, aktualisiere die IP-Adresse
         camera.ip = cameraIP;
       } else {
         // Falls die Kamera neu ist, füge sie hinzu
-        camera = { id: i, ip: cameraIP, presets: {} };
+        camera = { id: cameraId, ip: cameraIP, presets: {} };
       }
+      
+      // Aktualisierte oder neue Kamera zur Liste hinzufügen
       updatedCameras.push(camera);
     }
-  }
+  });
 
-  // JSON mit der neuen Kamera-Liste aktualisieren
+  // Entfernte Kameras filtern (z.B., falls Kamera entfernt wurde)
   settings.cameras = updatedCameras;
 
   // Speichere die aktualisierten Einstellungen
@@ -89,6 +94,7 @@ async function saveSettings() {
   // Hauptbildschirm aktualisieren
   updateCameraBlocks(settings.cameras);
 }
+
 
 
 
@@ -111,17 +117,21 @@ async function loadSettings() {
       `;
 
       // Buttons je nach Kamera-ID hinzufügen
-      if (camera.id === 3) {
-        // Bei Kamera 3 nur den + Button anzeigen
+      if (camera.id === 1 || camera.id === 2) {
+        // Kameras 1 und 2: Platzhalter für fehlende Buttons
+        cameraField.innerHTML += `<div class="button-placeholder"></div><div class="button-placeholder"></div>`;
+      } else if (camera.id === 3) {
+        // Kamera 3: Platzhalter für den fehlenden Minus-Button und nur Plus-Button anzeigen
+        cameraField.innerHTML += `<div class="button-placeholder"></div>`;
         cameraField.innerHTML += `<button onclick="addCameraField()" class="camera-btn">+</button>`;
-      } else if (camera.id > 3) {
-        // Bei weiteren Kameras sowohl + als auch - Buttons anzeigen
+      } else {
+        // Kameras 4 und höher: Sowohl Minus- als auch Plus-Buttons anzeigen
         cameraField.innerHTML += `
           <button onclick="removeCameraField(${camera.id})" class="camera-btn">-</button>
           <button onclick="addCameraField()" class="camera-btn">+</button>
         `;
       }
-      
+
       cameraSettingsContainer.appendChild(cameraField);
     });
 
@@ -135,19 +145,24 @@ async function loadSettings() {
 
 
 
+
 // Funktion zum Hinzufügen eines neuen Kamera-IP-Feldes
 function addCameraField() {
-  cameraCount++;
+  cameraCount++; // Erhöhe die Kameraanzahl
   const newCameraField = document.createElement("div");
   newCameraField.classList.add("camera-row");
+
+  // Neues Kamera-Feld mit ID basierend auf cameraCount erstellen
   newCameraField.innerHTML = `
     <label for="cam${cameraCount}-ip">Cam ${cameraCount} IP:</label>
     <input type="text" id="cam${cameraCount}-ip" value="10.10.10.${100 + cameraCount}" class="camera-input">
     <button onclick="removeCameraField(${cameraCount})" class="camera-btn">-</button>
     <button onclick="addCameraField()" class="camera-btn">+</button>
   `;
+
   cameraSettingsContainer.appendChild(newCameraField);
 }
+
 
 
 
