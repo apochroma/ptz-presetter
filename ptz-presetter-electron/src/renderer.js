@@ -58,27 +58,38 @@ async function saveSettings() {
   // Bestehende Einstellungen laden
   const settings = await window.electron.loadSettings() || { cameras: [] };
 
-  // Aktualisiere oder füge Kameras hinzu, ohne Preset-Daten zu überschreiben
-  for (let i = 1; i <= cameraCount; i++) {
+  // Aktuelle Kamera-IDs und IPs aus der Settings-Sektion ermitteln
+  const updatedCameras = [];
+  const visibleCameraCount = document.querySelectorAll("#camera-settings > div").length;
+
+  for (let i = 1; i <= visibleCameraCount; i++) {
     const ipField = document.getElementById(`cam${i}-ip`);
     if (ipField) {
       const cameraIP = ipField.value;
       let camera = settings.cameras.find(c => c.id === i);
 
       if (camera) {
-        // Falls die Kamera bereits existiert, nur die IP-Adresse aktualisieren
+        // Falls die Kamera existiert, aktualisiere die IP-Adresse
         camera.ip = cameraIP;
       } else {
-        // Falls die Kamera neu ist, hinzufügen
-        settings.cameras.push({ id: i, ip: cameraIP, presets: {} });
+        // Falls die Kamera neu ist, füge sie hinzu
+        camera = { id: i, ip: cameraIP, presets: {} };
       }
+      updatedCameras.push(camera);
     }
   }
 
+  // JSON mit der neuen Kamera-Liste aktualisieren
+  settings.cameras = updatedCameras;
+
   // Speichere die aktualisierten Einstellungen
-  const response = await window.electron.saveSettings(settings);
-  console.log(response);
+  await window.electron.saveSettings(settings);
+  console.log("Einstellungen gespeichert:", settings);
+
+  // Hauptbildschirm aktualisieren
+  updateCameraBlocks(settings.cameras);
 }
+
 
 
 // Funktion zum Laden der Einstellungen
@@ -86,17 +97,16 @@ async function loadSettings() {
   const settings = await window.electron.loadSettings();
   if (settings) {
     console.log('Einstellungen erfolgreich geladen:', settings);
-    cameraCount = settings.cameras.length;
-
-    // Setze die Kamera-IP-Felder basierend auf den geladenen Einstellungen
+    cameraCount = settings.cameras.length; // Anzahl der Kameras basierend auf JSON
     cameraSettingsContainer.innerHTML = '';
-    settings.cameras.forEach((camera, index) => {
+
+    settings.cameras.forEach(camera => {
       const cameraField = document.createElement("div");
       cameraField.innerHTML = `
         <label for="cam${camera.id}-ip">Cam ${camera.id} IP:</label>
         <input type="text" id="cam${camera.id}-ip" value="${camera.ip}">
-        ${index >= 2 ? `<button onclick="addCameraField()">+</button>` : ''}
-        ${index >= 3 ? `<button onclick="removeCameraField(${camera.id})">-</button>` : ''}
+        <button onclick="addCameraField()">+</button>
+        <button onclick="removeCameraField(${camera.id})">-</button>
         <br>
       `;
       cameraSettingsContainer.appendChild(cameraField);
@@ -107,6 +117,8 @@ async function loadSettings() {
     console.log("Keine Einstellungen gefunden, Standardwerte verwenden.");
   }
 }
+
+
 
 // Funktion zum Hinzufügen eines neuen Kamera-IP-Feldes
 function addCameraField() {
@@ -121,6 +133,7 @@ function addCameraField() {
   `;
   cameraSettingsContainer.appendChild(newCameraField);
 }
+
 
 // Funktion zum Entfernen eines Kamera-IP-Feldes
 function removeCameraField(id) {
