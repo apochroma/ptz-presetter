@@ -2,6 +2,36 @@ const { app, BrowserWindow, ipcMain, session } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
+function ensureDefaultSettings() {
+  // Pfad zur Konfigurationsdatei
+  const settingsPath = path.join(app.getPath('userData'), 'camera_settings.json');
+
+  // Überprüfen, ob die Datei existiert
+  if (!fs.existsSync(settingsPath)) {
+    console.log('Keine camera_settings.json gefunden. Erstelle Standardkonfiguration...');
+
+    // Standardkonfiguration
+    const defaultSettings = {
+      cameras: [
+        { id: 1, ip: '192.168.0.101', presets: {} },
+        { id: 2, ip: '192.168.0.102', presets: {} },
+        { id: 3, ip: '192.168.0.103', presets: {} }
+      ]
+    };
+
+    // Datei erstellen
+    fs.writeFileSync(settingsPath, JSON.stringify(defaultSettings, null, 2));
+    console.log('Standardkonfiguration erstellt:', settingsPath);
+  } else {
+    console.log('Einstellungen gefunden:', settingsPath);
+  }
+}
+
+// Aufrufen, bevor die App vollständig geladen wird
+app.on('ready', () => {
+  ensureDefaultSettings();
+});
+
 // Speichern des Kamerabildes im Unterordner `preset-images`
 ipcMain.handle('save-camera-image', async (event, cameraNumber, presetNumber, imageData) => {
   const appDataPath = app.getPath('userData');
