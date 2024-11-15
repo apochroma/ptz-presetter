@@ -97,17 +97,17 @@ async function loadSettings() {
   const settings = await window.electron.loadSettings();
   if (settings) {
     console.log('Einstellungen erfolgreich geladen:', settings);
-    cameraCount = settings.cameras.length; // Anzahl der Kameras basierend auf JSON
+    cameraCount = settings.cameras.length;
     cameraSettingsContainer.innerHTML = '';
 
     settings.cameras.forEach(camera => {
       const cameraField = document.createElement("div");
+      cameraField.classList.add("camera-row"); // Neue CSS-Klasse für das Layout
       cameraField.innerHTML = `
         <label for="cam${camera.id}-ip">Cam ${camera.id} IP:</label>
-        <input type="text" id="cam${camera.id}-ip" value="${camera.ip}">
-        <button onclick="addCameraField()">+</button>
-        <button onclick="removeCameraField(${camera.id})">-</button>
-        <br>
+        <input type="text" id="cam${camera.id}-ip" value="${camera.ip}" class="camera-input">
+        <button onclick="removeCameraField(${camera.id})" class="camera-btn">-</button>
+        <button onclick="addCameraField()" class="camera-btn">+</button>
       `;
       cameraSettingsContainer.appendChild(cameraField);
     });
@@ -120,29 +120,29 @@ async function loadSettings() {
 
 
 
+
 // Funktion zum Hinzufügen eines neuen Kamera-IP-Feldes
 function addCameraField() {
   cameraCount++;
   const newCameraField = document.createElement("div");
+  newCameraField.classList.add("camera-row"); // Neue CSS-Klasse für das Layout
   newCameraField.innerHTML = `
     <label for="cam${cameraCount}-ip">Cam ${cameraCount} IP:</label>
-    <input type="text" id="cam${cameraCount}-ip" value="10.10.10.${100 + cameraCount}">
-    <button onclick="addCameraField()">+</button>
-    <button onclick="removeCameraField(${cameraCount})">-</button>
-    <br>
+    <input type="text" id="cam${cameraCount}-ip" value="10.10.10.${100 + cameraCount}" class="camera-input">
+    <button onclick="removeCameraField(${cameraCount})" class="camera-btn">-</button>
+    <button onclick="addCameraField()" class="camera-btn">+</button>
   `;
   cameraSettingsContainer.appendChild(newCameraField);
 }
 
 
+
 // Funktion zum Entfernen eines Kamera-IP-Feldes
-function removeCameraField(id) {
-  if (id > 3) {
-    const field = document.getElementById(`cam${id}-ip`).parentNode;
-    cameraSettingsContainer.removeChild(field);
-    cameraCount--;
-  }
+function removeCameraField(cameraId) {
+  const cameraField = document.querySelector(`#cam${cameraId}-ip`).parentNode;
+  cameraSettingsContainer.removeChild(cameraField);
 }
+
 
 // Funktion zum Abspielen eines Presets
 function playPreset(cameraNumber, presetNumber) {

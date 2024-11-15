@@ -96,3 +96,58 @@
   margin-left: 5px;
 }
 
+/* Layout für eine Kamera-Reihe */
+.camera-row {
+  display: flex;
+  align-items: baseline; /* Vertikale Zentrierung der Elemente */
+  gap: 8px; /* Abstand zwischen den Elementen */
+  margin-bottom: 10px; /* Abstand zwischen den Kamera-Reihen */
+}
+
+/* Eingabefeld für die IP-Adresse */
+.camera-row .camera-input {
+  width: 200px; /* Breite für IP-Adresse */
+  height: 40px; /* Einheitliche Höhe */
+  font-size: 14px;
+  padding: 8px;
+  text-align: center;
+  background-color: #333;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Stil für die Plus- und Minus-Buttons */
+.camera-row .camera-btn {
+  width: 40px; /* Breite des Buttons */
+  height: 40px; /* Höhe passend zum Eingabefeld */
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #333;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-sizing: border-box;
+  padding: 0; /* Kein Padding, um die Höhe exakt zu halten */
+  margin: 0; /* Keine zusätzliche Margin */
+}
+
+.camera-row .camera-btn:hover {
+  background-color: #444;
+}
+
+.camera-row .camera-btn:active {
+  background-color: #555;
+}
+
+/* Stil für die Labels in der Kamera-Reihe */
+.camera-row label {
+  font-size: 14px;
+  white-space: nowrap; /* Kein Zeilenumbruch */
+  color: white;
+}
