@@ -102,13 +102,26 @@ async function loadSettings() {
 
     settings.cameras.forEach(camera => {
       const cameraField = document.createElement("div");
-      cameraField.classList.add("camera-row"); // Neue CSS-Klasse für das Layout
+      cameraField.classList.add("camera-row");
+
+      // Grundaufbau des Kamera-Felds
       cameraField.innerHTML = `
         <label for="cam${camera.id}-ip">Cam ${camera.id} IP:</label>
         <input type="text" id="cam${camera.id}-ip" value="${camera.ip}" class="camera-input">
-        <button onclick="removeCameraField(${camera.id})" class="camera-btn">-</button>
-        <button onclick="addCameraField()" class="camera-btn">+</button>
       `;
+
+      // Buttons je nach Kamera-ID hinzufügen
+      if (camera.id === 3) {
+        // Bei Kamera 3 nur den + Button anzeigen
+        cameraField.innerHTML += `<button onclick="addCameraField()" class="camera-btn">+</button>`;
+      } else if (camera.id > 3) {
+        // Bei weiteren Kameras sowohl + als auch - Buttons anzeigen
+        cameraField.innerHTML += `
+          <button onclick="removeCameraField(${camera.id})" class="camera-btn">-</button>
+          <button onclick="addCameraField()" class="camera-btn">+</button>
+        `;
+      }
+      
       cameraSettingsContainer.appendChild(cameraField);
     });
 
@@ -121,11 +134,12 @@ async function loadSettings() {
 
 
 
+
 // Funktion zum Hinzufügen eines neuen Kamera-IP-Feldes
 function addCameraField() {
   cameraCount++;
   const newCameraField = document.createElement("div");
-  newCameraField.classList.add("camera-row"); // Neue CSS-Klasse für das Layout
+  newCameraField.classList.add("camera-row");
   newCameraField.innerHTML = `
     <label for="cam${cameraCount}-ip">Cam ${cameraCount} IP:</label>
     <input type="text" id="cam${cameraCount}-ip" value="10.10.10.${100 + cameraCount}" class="camera-input">
@@ -134,6 +148,7 @@ function addCameraField() {
   `;
   cameraSettingsContainer.appendChild(newCameraField);
 }
+
 
 
 
