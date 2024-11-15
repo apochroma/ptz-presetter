@@ -1,4 +1,5 @@
 /* Allgemeine Stile */
+
 body {
   font-family: Arial, sans-serif;
   text-align: center;
@@ -75,6 +76,17 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 2px; /* Platzhalter-Margin für nicht ausgewählte Presets */
+  border: none; /* Kein Rahmen standardmäßig */
+  
+  padding: 5px;
+}
+
+/* Aktives Preset mit grünem Rahmen */
+.preset.active-preset {
+  margin: 0; /* Entfernt das Margin */
+  border: 2px solid green; /* Fügt den Rahmen hinzu */
+  padding: 5px;
 }
 
 .thumbnail-container {
