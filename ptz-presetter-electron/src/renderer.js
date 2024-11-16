@@ -63,27 +63,49 @@ async function saveSettings() {
   const updatedCameras = [];
   const cameraFields = document.querySelectorAll("#camera-settings > .camera-row");
 
+  let allValid = true; // Flag zur Überprüfung, ob alle Eingaben gültig sind
+  const seenIPs = new Set(); // Set zur Verfolgung bereits eingegebener IPs
+
   cameraFields.forEach((field, index) => {
     const ipField = field.querySelector("input[type='text']");
     if (ipField) {
-      const cameraIP = ipField.value;
+      const cameraIP = ipField.value.trim(); // Eingabe trimmen
       const cameraId = index + 1; // ID basierend auf Position festlegen
 
-      // Suche die Kamera mit der aktuellen ID in den geladenen Einstellungen
-      let camera = settings.cameras.find(c => c.id === cameraId);
-
-      if (camera) {
-        // Falls die Kamera existiert, aktualisiere die IP-Adresse
-        camera.ip = cameraIP;
+      // Überprüfung der IP-Adresse
+      if (!isValidIPv4(cameraIP)) {
+        ipField.classList.add('invalid-ip'); // Ungültige Eingabe markieren
+        console.error(`Ungültige IP-Adresse für Kamera ${cameraId}: ${cameraIP}`);
+        allValid = false;
+      } else if (seenIPs.has(cameraIP)) {
+        ipField.classList.add('invalid-ip'); // Markiere doppelte IP als ungültig
+        console.error(`Doppelte IP-Adresse gefunden: ${cameraIP}`);
+        allValid = false;
       } else {
-        // Falls die Kamera neu ist, füge sie hinzu
-        camera = { id: cameraId, ip: cameraIP, presets: {} };
+        ipField.classList.remove('invalid-ip'); // Markierung entfernen, wenn gültig
+        seenIPs.add(cameraIP); // IP-Adresse zu "gesehen" hinzufügen
+
+        // Kamera-Daten aktualisieren oder hinzufügen
+        let camera = settings.cameras.find(c => c.id === cameraId);
+
+        if (camera) {
+          // Falls die Kamera existiert, aktualisiere die IP-Adresse
+          camera.ip = cameraIP;
+        } else {
+          // Falls die Kamera neu ist, füge sie hinzu
+          camera = { id: cameraId, ip: cameraIP, presets: {} };
+        }
+
+        // Aktualisierte oder neue Kamera zur Liste hinzufügen
+        updatedCameras.push(camera);
       }
-      
-      // Aktualisierte oder neue Kamera zur Liste hinzufügen
-      updatedCameras.push(camera);
     }
   });
+
+  if (!allValid) {
+    alert("Bitte korrigieren Sie die ungültigen oder doppelten IP-Adressen, bevor Sie speichern.");
+    return; // Speicherung abbrechen, wenn ungültige oder doppelte IPs vorhanden sind
+  }
 
   // Entfernte Kameras filtern (z.B., falls Kamera entfernt wurde)
   settings.cameras = updatedCameras;
@@ -97,7 +119,18 @@ async function saveSettings() {
 }
 
 
+//Überprüfung einer validen IP Adresse
+function isValidIPv4(ip) {
+  const octets = ip.split(".");
+  if (octets.length !== 4) return false;
 
+  for (const octet of octets) {
+    const value = Number(octet);
+    if (isNaN(value) || value < 0 || value > 255) return false;
+  }
+
+  return true;
+}
 
 // Funktion zum Laden der Einstellungen
 async function loadSettings() {
@@ -318,14 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('camera-container Element nicht gefunden');
     return;
   }
-
-  const saveButton = document.getElementById('save-button');
-  if (!saveButton) {
-    console.error('save-button Element nicht gefunden');
-  } else {
-    saveButton.addEventListener('click', saveSettings);
-  }
-
+  
   loadSettings(); // Einstellungen beim Laden abrufen
 });
 

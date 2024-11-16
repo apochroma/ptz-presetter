@@ -140,3 +140,8 @@ h1 {
   box-sizing: border-box; /* Damit der Rahmen nach innen geht und die Größe gleich bleibt */
   border: 3px solid green;
 }
+
+.invalid-ip {
+  border: 2px solid red; /* Roter Rand für ungültige Eingaben */
+  background-color: #ffe6e6; /* Leicht roter Hintergrund */
+}

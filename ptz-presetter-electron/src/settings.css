@@ -160,3 +160,7 @@
   white-space: nowrap; /* Kein Zeilenumbruch */
   color: white;
 }
+
+.camera-row input.invalid-ip {
+  border: 2px solid red; /* Roter Rand für ungültige Eingaben */
+}
