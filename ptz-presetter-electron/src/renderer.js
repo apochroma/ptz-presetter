@@ -22,8 +22,24 @@ function toggleSettings() {
 async function updateCameraBlocks(cameras) {
   const settings = await window.electron.loadSettings();
 
+  // Stelle sicher, dass die Einstellungen korrekt geladen sind
+  if (!settings || !settings.cameras) {
+    console.error("Einstellungen konnten nicht geladen werden.");
+    return;
+  }
+
   cameraContainer.innerHTML = ""; // Vorhandene Blöcke löschen
+
   cameras.forEach(camera => {
+    // Kamera-Einstellungen abrufen
+    const cameraSettings = settings.cameras.find(c => c.id === camera.id);
+    if (!cameraSettings) {
+      console.error(`Einstellungen für Kamera ${camera.id} nicht gefunden.`);
+      return;
+    }
+
+    const visiblePresetCount = cameraSettings.visiblePresetCount || 10;
+
     const cameraBlock = document.createElement("div");
     cameraBlock.classList.add("camera-block");
     cameraBlock.innerHTML = `
@@ -31,7 +47,12 @@ async function updateCameraBlocks(cameras) {
       <div class="presets">
         ${Array.from({ length: 10 }).map((_, index) => {
           const presetNumber = index + 1;
-          const imagePath = settings.cameras[camera.id - 1]?.presets?.[presetNumber]?.imagePath || 'images/empty.png';
+          const preset = cameraSettings.presets[presetNumber];
+          const isVisible = preset?.visible || false;
+
+          if (!isVisible) return ""; // Überspringe nicht sichtbare Presets
+
+          const imagePath = preset?.imagePath || 'images/empty.png';
           return `
             <div class="preset" id="cam${camera.id}-preset${presetNumber}" data-preset="${presetNumber}">
               <div class="thumbnail-container">
@@ -52,6 +73,7 @@ async function updateCameraBlocks(cameras) {
     cameraContainer.appendChild(cameraBlock);
   });
 }
+
 
 // Funktion zum Speichern der Einstellungen
 async function saveSettings() {
