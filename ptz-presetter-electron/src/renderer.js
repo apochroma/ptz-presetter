@@ -74,8 +74,8 @@ async function updateCameraBlocks(cameras) {
                   <span class="preset-label">Preset ${presetNumber}</span>
                 </a>
                 <div class="controls">
-                  <button onclick="savePreset(${camera.id}, ${presetNumber})">💾</button>
-                  <button onclick="deletePreset(${camera.id}, ${presetNumber})">🗑️</button>
+                  <button title="Preset ${presetNumber} von der Kamera ${camera.id} mit der IP ${cameraSettings.ip} sichern" onclick="savePreset(${camera.id}, ${presetNumber})">💾</button>
+                  <button title="Preset ${presetNumber} von der Kamera ${camera.id} mit der IP ${cameraSettings.ip} löschen" onclick="deletePreset(${camera.id}, ${presetNumber})">🗑️</button>
                 </div>
               </div>
             </div>
