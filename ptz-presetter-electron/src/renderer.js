@@ -228,6 +228,9 @@ async function saveSettings() {
 
   // Hauptbildschirm aktualisieren
   updateCameraBlocks(settings.cameras);
+
+// Schließe das Settings-Menü mit der bestehenden toggleSettings-Funktion
+  toggleSettings();
 }
 
 //Überprüfung einer validen IP Adresse
