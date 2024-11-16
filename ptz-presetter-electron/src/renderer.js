@@ -28,9 +28,12 @@ async function updateCameraBlocks(cameras) {
     return;
   }
 
+  // Kameras nach `order` sortieren
+  const sortedCameras = settings.cameras.slice().sort((a, b) => (a.order || 0) - (b.order || 0));
+
   cameraContainer.innerHTML = ""; // Vorhandene Blöcke löschen
 
-  cameras.forEach(camera => {
+  sortedCameras.forEach(camera => {
     // Kamera-Einstellungen abrufen
     const cameraSettings = settings.cameras.find(c => c.id === camera.id);
     if (!cameraSettings) {
@@ -40,8 +43,18 @@ async function updateCameraBlocks(cameras) {
 
     const visiblePresetCount = cameraSettings.visiblePresetCount || 10;
 
+    // Kamera-Block erstellen
     const cameraBlock = document.createElement("div");
     cameraBlock.classList.add("camera-block");
+    cameraBlock.setAttribute("draggable", "true");
+    cameraBlock.setAttribute("data-id", camera.id);
+
+    // Drag-and-Drop-Event-Listener
+    cameraBlock.addEventListener("dragstart", handleDragStart);
+    cameraBlock.addEventListener("dragover", handleDragOver);
+    cameraBlock.addEventListener("drop", handleDrop);
+
+    // Kamera-Inhalt erstellen
     cameraBlock.innerHTML = `
       <div class="camera-title">Cam ${camera.id}</div>
       <div class="presets">
@@ -73,6 +86,71 @@ async function updateCameraBlocks(cameras) {
     cameraContainer.appendChild(cameraBlock);
   });
 }
+
+let draggedElement = null;
+
+function handleDragStart(event) {
+  draggedElement = event.target;
+  event.dataTransfer.effectAllowed = "move";
+  event.target.classList.add("dragging");
+}
+
+function handleDragOver(event) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+}
+
+function handleDrop(event) {
+  event.preventDefault();
+
+  const targetElement = event.target.closest(".camera-block");
+  if (!targetElement || draggedElement === targetElement) return;
+
+  const container = document.getElementById("camera-container");
+
+  // Tausche die Positionen im DOM
+  const draggedIndex = [...container.children].indexOf(draggedElement);
+  const targetIndex = [...container.children].indexOf(targetElement);
+
+  if (draggedIndex < targetIndex) {
+    container.insertBefore(draggedElement, targetElement.nextSibling);
+  } else {
+    container.insertBefore(draggedElement, targetElement);
+  }
+
+  // Aktualisiere die Reihenfolge in der JSON
+  updateCameraOrder();
+
+  // Transparenz und Dragging-Klasse entfernen
+  draggedElement.classList.remove("dragging");
+  draggedElement = null;
+}
+
+// Aktualisiert die Reihenfolge der Kameras basierend auf Drag-and-Drop
+async function updateCameraOrder() {
+  const container = document.getElementById("camera-container");
+  const cameraBlocks = Array.from(container.children);
+
+  // Lese die aktuelle Reihenfolge aus dem DOM
+  const updatedOrder = cameraBlocks.map((block, index) => {
+    const id = parseInt(block.getAttribute("data-id"), 10);
+    return { id, order: index };
+  });
+
+  // Aktualisiere die JSON-Daten
+  const settings = await window.electron.loadSettings();
+  settings.cameras.forEach(camera => {
+    const newOrder = updatedOrder.find(o => o.id === camera.id)?.order;
+    if (newOrder !== undefined) {
+      camera.order = newOrder;
+    }
+  });
+
+  // Speichere die aktualisierte JSON
+  await window.electron.saveSettings(settings);
+  console.log("Neue Sortierreihenfolge gespeichert:", settings.cameras);
+}
+
 
 
 // Funktion zum Speichern der Einstellungen

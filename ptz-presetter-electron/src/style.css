@@ -141,7 +141,11 @@ h1 {
   border: 3px solid green;
 }
 
-.invalid-ip {
-  border: 2px solid red; /* Roter Rand für ungültige Eingaben */
-  background-color: #ffe6e6; /* Leicht roter Hintergrund */
+.camera-block.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.camera-block {
+  cursor: grab;
 }
