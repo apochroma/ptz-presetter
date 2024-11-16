@@ -69,7 +69,7 @@ async function updateCameraBlocks(cameras) {
           return `
             <div class="preset" id="cam${camera.id}-preset${presetNumber}" data-preset="${presetNumber}">
               <div class="thumbnail-container">
-                <a href="#" onclick="playPreset(${camera.id}, ${presetNumber})">
+                <a href="#" onclick="playPreset(${camera.id}, ${presetNumber}, event)">
                   <img class="thumbnail" src="${imagePath}" alt="Preset ${presetNumber}">
                   <span class="preset-label">Preset ${presetNumber}</span>
                 </a>
@@ -342,6 +342,10 @@ function removeCameraField(cameraId) {
 
 // Funktion zum Abspielen eines Presets
 function playPreset(cameraNumber, presetNumber) {
+
+  if (event) {
+    event.preventDefault();
+  }
 
   //Highlight active Preset
   highlightPreset(cameraNumber, presetNumber);
