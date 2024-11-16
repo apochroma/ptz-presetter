@@ -175,8 +175,9 @@
   border: none; /* Keine Umrandung für Platzhalter */
 }
 
+
 /* Stil für die Plus- und Minus-Buttons */
-.camera-row .camera-btn {
+.camera-row .camera-btn, .camera-row select {
   width: 40px;
   height: 40px;
   font-size: 16px;

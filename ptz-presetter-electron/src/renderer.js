@@ -159,7 +159,7 @@ async function loadSettings() {
       cameraField.innerHTML = `
         <label for="cam${camera.id}-ip">Cam ${camera.id} IP:</label>
         <input type="text" id="cam${camera.id}-ip" value="${camera.ip}" class="camera-input">
-        <select id="cam${camera.id}-preset-count">
+        <select title="Wähle die Anzahl sichtbare Presets aus" id="cam${camera.id}-preset-count">
           ${Array.from({ length: 10 }).map((_, i) => `
             <option value="${i + 1}" ${camera.visiblePresetCount === i + 1 ? 'selected' : ''}>
               ${i + 1}
@@ -200,8 +200,8 @@ function addCameraField() {
   newCameraField.innerHTML = `
     <label for="cam${cameraCount}-ip">Cam ${cameraCount} IP:</label>
     <input type="text" id="cam${cameraCount}-ip" value="10.10.10.${100 + cameraCount}" class="camera-input">
-    <select id="cam${cameraCount}-preset-count" class="preset-dropdown">
-      ${Array.from({ length: 10 }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join("")}
+    <select title="Wähle die Anzahl sichtbare Presets aus" id="cam${cameraCount}-preset-count" class="preset-dropdown">
+      ${Array.from({ length: 10 }, (_, i) => `<option value="${i + 1}" ${i + 1 === 10 ? "selected" : ""}>${i + 1}</option>`).join("")}
     </select>
     <button onclick="removeCameraField(${cameraCount})" class="camera-btn">-</button>
     <button onclick="addCameraField()" class="camera-btn">+</button>
