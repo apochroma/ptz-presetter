@@ -87,27 +87,34 @@ async function updateCameraBlocks(cameras) {
   });
 }
 
-
+// START OF Drag Routines
 let draggedElement = null;
 
 function handleDragStart(event) {
-  draggedElement = event.target;
-  event.dataTransfer.effectAllowed = "move";
-  event.target.classList.add("dragging");
+  draggedElement = event.target.closest(".camera-block");
+  if (draggedElement) {
+    draggedElement.classList.add("dragging");
+  }
 }
 
 function handleDragOver(event) {
   event.preventDefault();
-  event.dataTransfer.dropEffect = "move";
 }
 
 function handleDrop(event) {
   event.preventDefault();
 
-  const targetElement = event.target.closest(".camera-block");
-  if (!targetElement || draggedElement === targetElement) return;
-
   const container = document.getElementById("camera-container");
+  const targetElement = event.target.closest(".camera-block");
+
+  // Wenn kein Ziel gefunden wurde oder die Ziel- und Drag-Elemente identisch sind
+  if (!targetElement || draggedElement === targetElement) {
+    if (draggedElement) {
+      draggedElement.classList.remove("dragging");
+      draggedElement = null;
+    }
+    return;
+  }
 
   // Tausche die Positionen im DOM
   const draggedIndex = [...container.children].indexOf(draggedElement);
@@ -122,10 +129,22 @@ function handleDrop(event) {
   // Aktualisiere die Reihenfolge in der JSON
   updateCameraOrder();
 
-  // Transparenz und Dragging-Klasse entfernen
+  // Entferne Transparenz und die Klasse `dragging`
   draggedElement.classList.remove("dragging");
   draggedElement = null;
 }
+
+function handleDragEnd() {
+  // Stelle sicher, dass die Klasse `dragging` entfernt wird, wenn der Benutzer das Drag beendet
+  if (draggedElement) {
+    draggedElement.classList.remove("dragging");
+    draggedElement = null;
+  }
+}
+
+document.addEventListener("dragend", handleDragEnd);
+
+// END OF Drag Routines
 
 // Aktualisiert die Reihenfolge der Kameras basierend auf Drag-and-Drop
 async function updateCameraOrder() {
