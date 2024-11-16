@@ -53,7 +53,6 @@ async function updateCameraBlocks(cameras) {
   });
 }
 
-
 // Funktion zum Speichern der Einstellungen
 async function saveSettings() {
   // Bestehende Einstellungen laden oder neues Objekt erstellen
@@ -68,8 +67,11 @@ async function saveSettings() {
 
   cameraFields.forEach((field, index) => {
     const ipField = field.querySelector("input[type='text']");
-    if (ipField) {
+    const presetCountField = field.querySelector("select");
+
+    if (ipField && presetCountField) {
       const cameraIP = ipField.value.trim(); // Eingabe trimmen
+      const visiblePresetCount = parseInt(presetCountField.value, 10); // Dropdown-Wert lesen
       const cameraId = index + 1; // ID basierend auf Position festlegen
 
       // Überprüfung der IP-Adresse
@@ -91,9 +93,19 @@ async function saveSettings() {
         if (camera) {
           // Falls die Kamera existiert, aktualisiere die IP-Adresse
           camera.ip = cameraIP;
+          camera.visiblePresetCount = visiblePresetCount; // Sichtbare Presets aktualisieren
         } else {
           // Falls die Kamera neu ist, füge sie hinzu
-          camera = { id: cameraId, ip: cameraIP, presets: {} };
+          camera = { id: cameraId, ip: cameraIP, presets: {}, visiblePresetCount: visiblePresetCount };
+        }
+
+        // Aktualisiere oder initialisiere Preset-Details
+        for (let i = 1; i <= 10; i++) {
+          if (!camera.presets[i]) {
+            camera.presets[i] = { imagePath: 'images/empty.png', visible: i <= visiblePresetCount };
+          } else {
+            camera.presets[i].visible = i <= visiblePresetCount;
+          }
         }
 
         // Aktualisierte oder neue Kamera zur Liste hinzufügen
@@ -117,7 +129,6 @@ async function saveSettings() {
   // Hauptbildschirm aktualisieren
   updateCameraBlocks(settings.cameras);
 }
-
 
 //Überprüfung einer validen IP Adresse
 function isValidIPv4(ip) {
@@ -148,18 +159,21 @@ async function loadSettings() {
       cameraField.innerHTML = `
         <label for="cam${camera.id}-ip">Cam ${camera.id} IP:</label>
         <input type="text" id="cam${camera.id}-ip" value="${camera.ip}" class="camera-input">
+        <select id="cam${camera.id}-preset-count">
+          ${Array.from({ length: 10 }).map((_, i) => `
+            <option value="${i + 1}" ${camera.visiblePresetCount === i + 1 ? 'selected' : ''}>
+              ${i + 1}
+            </option>`).join('')}
+        </select>
       `;
 
       // Buttons je nach Kamera-ID hinzufügen
       if (camera.id === 1 || camera.id === 2) {
-        // Kameras 1 und 2: Platzhalter für fehlende Buttons
         cameraField.innerHTML += `<div class="button-placeholder"></div><div class="button-placeholder"></div>`;
       } else if (camera.id === 3) {
-        // Kamera 3: Platzhalter für den fehlenden Minus-Button und nur Plus-Button anzeigen
         cameraField.innerHTML += `<div class="button-placeholder"></div>`;
         cameraField.innerHTML += `<button onclick="addCameraField()" class="camera-btn">+</button>`;
       } else {
-        // Kameras 4 und höher: Sowohl Minus- als auch Plus-Buttons anzeigen
         cameraField.innerHTML += `
           <button onclick="removeCameraField(${camera.id})" class="camera-btn">-</button>
           <button onclick="addCameraField()" class="camera-btn">+</button>
@@ -175,6 +189,7 @@ async function loadSettings() {
   }
 }
 
+
 // Funktion zum Hinzufügen eines neuen Kamera-IP-Feldes
 function addCameraField() {
   cameraCount++; // Erhöhe die Kameraanzahl
@@ -185,12 +200,16 @@ function addCameraField() {
   newCameraField.innerHTML = `
     <label for="cam${cameraCount}-ip">Cam ${cameraCount} IP:</label>
     <input type="text" id="cam${cameraCount}-ip" value="10.10.10.${100 + cameraCount}" class="camera-input">
+    <select id="cam${cameraCount}-preset-count" class="preset-dropdown">
+      ${Array.from({ length: 10 }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join("")}
+    </select>
     <button onclick="removeCameraField(${cameraCount})" class="camera-btn">-</button>
     <button onclick="addCameraField()" class="camera-btn">+</button>
   `;
 
   cameraSettingsContainer.appendChild(newCameraField);
 }
+
 
 // Funktion zum Entfernen eines Kamera-IP-Feldes
 function removeCameraField(cameraId) {
@@ -292,8 +311,6 @@ async function savePreset(cameraNumber, presetNumber) {
   }
 }
 
-
-
 // Funktion zum Löschen eines Presets
 async function deletePreset(cameraNumber, presetNumber) {
   const ipField = document.getElementById(`cam${cameraNumber}-ip`);
@@ -344,7 +361,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loadSettings(); // Einstellungen beim Laden abrufen
 });
-
 
 // Funktion zum Hervorheben des zuletzt ausgeführten Presets
 function highlightPreset(cameraId, presetNumber) {

@@ -24,7 +24,7 @@
   position: fixed;
   top: 0;
   left: 0; /* Anfangs ist es sichtbar, aber versteckt mit transform */
-  width: 300px;
+  width: 400px;
   height: 100%; /* Volle Fensterhöhe */
   background-color: #222;
   padding: 20px;
@@ -43,6 +43,7 @@
   overflow-y: auto; /* Vertikale Scrollleiste */
   scrollbar-width: thin; /* Dünnere Scrollleiste (Firefox) */
   scrollbar-color: #555 #222; /* Scrollbar-Farben (Firefox) */
+
 }
 
 /* Stil für die Scrollleiste */
@@ -145,7 +146,7 @@
 /* Layout für eine Kamera-Reihe */
 .camera-row {
   display: grid;
-  grid-template-columns: auto 1fr auto auto; /* Spalten für Label, Eingabefeld, Minus- und Plus-Button */
+  grid-template-columns: auto 1fr auto auto auto; /* Spalten für Label, Eingabefeld, Minus- und Plus-Button */
   align-items: baseline; /* Zentrierte Ausrichtung in jeder Zeile */
   gap: 12px; /* Abstand zwischen den Spalten */
   margin-bottom: 10px;
@@ -209,4 +210,9 @@
 
 .camera-row input.invalid-ip {
   border: 2px solid red; /* Roter Rand für ungültige Eingaben */
+}
+
+.camera-presets {
+  width: 60px; /* Breite des Dropdowns */
+  padding: 5px;
 }
