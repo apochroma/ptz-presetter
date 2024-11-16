@@ -175,11 +175,6 @@ async function loadSettings() {
   }
 }
 
-
-
-
-
-
 // Funktion zum Hinzufügen eines neuen Kamera-IP-Feldes
 function addCameraField() {
   cameraCount++; // Erhöhe die Kameraanzahl
@@ -197,16 +192,11 @@ function addCameraField() {
   cameraSettingsContainer.appendChild(newCameraField);
 }
 
-
-
-
-
 // Funktion zum Entfernen eines Kamera-IP-Feldes
 function removeCameraField(cameraId) {
   const cameraField = document.querySelector(`#cam${cameraId}-ip`).parentNode;
   cameraSettingsContainer.removeChild(cameraField);
 }
-
 
 // Funktion zum Abspielen eines Presets
 function playPreset(cameraNumber, presetNumber) {
@@ -351,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('camera-container Element nicht gefunden');
     return;
   }
-  
+
   loadSettings(); // Einstellungen beim Laden abrufen
 });
 

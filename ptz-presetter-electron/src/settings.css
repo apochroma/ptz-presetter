@@ -25,17 +25,40 @@
   top: 0;
   left: 0; /* Anfangs ist es sichtbar, aber versteckt mit transform */
   width: 300px;
-  height: 100%;
+  height: 100%; /* Volle Fensterhöhe */
   background-color: #222;
   padding: 20px;
-  padding-top: 50px; /* Platz für den Titel */
   color: white;
   transform: translateX(-100%); /* Schiebt das Menü aus dem Bild */
   opacity: 0; /* Versteckt das Menü visuell */
   transition: transform 0.5s ease, opacity 0.5s ease; /* Animation für das Einblenden */
   z-index: 1001; /* Niedriger als das Icon */
   box-shadow: 3px 0 5px rgba(0, 0, 0, 0.5);
+
+  /* Layout-Optimierung */
+  display: flex; /* Flexbox für vertikale Ausrichtung */
+  flex-direction: column; /* Inhalte vertikal anordnen */
+
+  /* Scrollbarkeit */
+  overflow-y: auto; /* Vertikale Scrollleiste */
+  scrollbar-width: thin; /* Dünnere Scrollleiste (Firefox) */
+  scrollbar-color: #555 #222; /* Scrollbar-Farben (Firefox) */
 }
+
+/* Stil für die Scrollleiste */
+.settings-section::-webkit-scrollbar {
+  width: 8px; /* Breite der Scrollleiste */
+}
+
+.settings-section::-webkit-scrollbar-track {
+  background: #222; /* Hintergrund der Scrollleiste */
+}
+
+.settings-section::-webkit-scrollbar-thumb {
+  background-color: #555; /* Farbe des Scrollbalkens */
+  border-radius: 4px; /* Abgerundete Ecken */
+}
+
 
 /* Menü anzeigen, wenn die Klasse .visible vorhanden ist */
 .settings-section.visible {
@@ -94,6 +117,29 @@
 
 .settings-section .camera-settings-buttons button {
   margin-left: 5px;
+}
+
+#camera-settings {
+  flex: none; /* Ermöglicht feste Höhe */
+  height: calc(100% - 140px); /* Höhe basierend auf verfügbarem Platz minus 120px */
+  overflow-y: auto;
+  padding-right: 10px;
+  margin-bottom: 80px; /* Platz schaffen für den Save-Button */ 
+}
+
+#save-button {
+  background-color: #444;
+  color: white;
+  border: 1px solid #555;
+  padding: 10px;
+  width: 100%;
+  font-size: 1em;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: center;
+  margin-top: -80px; /* Abstand vom Ende des Inhalts */
+  margin-bottom: 10px; /* Abstand vom unteren Rand */
+  box-shadow: 0px -2px 6px rgba(0, 0, 0, 0.2); 
 }
 
 /* Layout für eine Kamera-Reihe */
