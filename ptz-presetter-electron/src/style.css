@@ -63,6 +63,19 @@ h1 {
   align-self: center;
 }
 
+
+
+
+.camera-title small.camera-ip {
+  font-size: 12px; /* Kleinere Schriftgröße für die IP-Adresse */
+  color: #aaa; /* Dezente Farbe */
+  margin-top: 3px; /* Abstand oberhalb der IP-Adresse */
+}
+
+
+
+
+
 /* Preset-Container und einzelne Presets */
 .presets {
   display: grid;

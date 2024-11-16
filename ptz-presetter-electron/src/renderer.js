@@ -56,16 +56,16 @@ async function updateCameraBlocks(cameras) {
 
     // Kamera-Inhalt erstellen
     cameraBlock.innerHTML = `
-      <div class="camera-title">Cam ${camera.id}</div>
+      <div class="camera-title">
+        Cam ${camera.id}</br>
+        <small class="camera-ip">${cameraSettings.ip}</small>
+      </div>
       <div class="presets">
-        ${Array.from({ length: 10 }).map((_, index) => {
+        ${Array.from({ length: visiblePresetCount }).map((_, index) => {
           const presetNumber = index + 1;
           const preset = cameraSettings.presets[presetNumber];
-          const isVisible = preset?.visible || false;
-
-          if (!isVisible) return ""; // Überspringe nicht sichtbare Presets
-
           const imagePath = preset?.imagePath || 'images/empty.png';
+
           return `
             <div class="preset" id="cam${camera.id}-preset${presetNumber}" data-preset="${presetNumber}">
               <div class="thumbnail-container">
@@ -86,6 +86,7 @@ async function updateCameraBlocks(cameras) {
     cameraContainer.appendChild(cameraBlock);
   });
 }
+
 
 let draggedElement = null;
 
