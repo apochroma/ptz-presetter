@@ -71,11 +71,12 @@ async function updateCameraBlocks(cameras) {
               <div class="thumbnail-container">
                 <a href="#" onclick="playPreset(${camera.id}, ${presetNumber}, event)">
                   <img class="thumbnail" src="${imagePath}" alt="Preset ${presetNumber}">
-                  <span class="preset-label">Preset ${presetNumber}</span>
+                  <span class="preset-label" contenteditable="true" onblur="saveLabel(this, ${camera.id}, ${presetNumber})">Preset ${presetNumber}</span>
                 </a>
                 <div class="controls">
                   <button title="Preset ${presetNumber} von der Kamera ${camera.id} mit der IP ${cameraSettings.ip} sichern" onclick="savePreset(${camera.id}, ${presetNumber})">💾</button>
                   <button title="Preset ${presetNumber} von der Kamera ${camera.id} mit der IP ${cameraSettings.ip} löschen" onclick="deletePreset(${camera.id}, ${presetNumber})">🗑️</button>
+                  <button title="Preset ${presetNumber} von der Kamera ${camera.id} mit der IP ${cameraSettings.ip} benennen" onclick="renamePreset(${camera.id}, ${presetNumber})">✏️</button>
                 </div>
               </div>
             </div>
@@ -170,8 +171,6 @@ async function updateCameraOrder() {
   await window.electron.saveSettings(settings);
   console.log("Neue Sortierreihenfolge gespeichert:", settings.cameras);
 }
-
-
 
 // Funktion zum Speichern der Einstellungen
 async function saveSettings() {
@@ -476,6 +475,35 @@ async function deletePreset(cameraNumber, presetNumber) {
   }
 }
 
+async function renamePreset(cameraId, presetNumber) {
+  console.log(`renamePreset wurde aufgerufen für Kamera ${cameraId}, Preset ${presetNumber}`);
+  
+  const newName = prompt(`Neuen Namen für Preset ${presetNumber} eingeben:`);
+  if (!newName) {
+    console.warn("Kein neuer Name eingegeben. Abbruch.");
+    return;
+  }
+
+  try {
+    // Lade die aktuellen Einstellungen
+    const settings = await window.electron.loadSettings();
+    const camera = settings.cameras.find(c => c.id === cameraId);
+
+    if (camera && camera.presets[presetNumber]) {
+      camera.presets[presetNumber].name = newName; // Name aktualisieren
+      await window.electron.saveSettings(settings); // Änderungen speichern
+      console.log(`Preset ${presetNumber} von Kamera ${cameraId} wurde in "${newName}" umbenannt.`);
+      updateCameraBlocks(settings.cameras); // Anzeige aktualisieren
+    } else {
+      console.error(`Preset ${presetNumber} oder Kamera ${cameraId} nicht gefunden.`);
+    }
+  } catch (error) {
+    console.error(`Fehler beim Umbenennen des Presets: ${error}`);
+  }
+}
+
+
+
 // Initialisieren und Pfade festlegen, sobald das DOM vollständig geladen ist
 document.addEventListener('DOMContentLoaded', () => {
   cameraSettingsContainer = document.getElementById("camera-settings");
@@ -505,3 +533,6 @@ function highlightPreset(cameraId, presetNumber) {
     console.error(`Preset ${presetNumber} für Kamera ${cameraId} nicht gefunden`);
   }
 }
+
+
+

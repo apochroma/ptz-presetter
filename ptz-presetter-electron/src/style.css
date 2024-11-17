@@ -125,13 +125,24 @@ h1 {
 }
 
 .preset-label {
+  width: 65%;
   position: absolute;
   bottom: 5px;
-  left: 50%;
+  left: 40%;
   transform: translateX(-50%);
   color: #fff;
   font-size: 0.9em;
   padding: 2px;
+  background-color: rgba(0,0,0,0.6 );
+}
+
+.preset-label[contenteditable="true"] {
+  cursor: text;
+}
+
+.preset-label[contenteditable="true"]:focus {
+  padding:5px;
+  background-color: rgba(0,0,240,0.6);
 }
 
 /* Steuerungselemente (Speichern und Löschen) */
