@@ -63,6 +63,7 @@ async function updateCameraBlocks(cameras) {
       <div class="presets">
         ${Array.from({ length: visiblePresetCount }).map((_, index) => {
           const presetNumber = index + 1;
+          const presetName = cameraSettings.presets[presetNumber]?.name || `Preset ${presetNumber}`;
           const preset = cameraSettings.presets[presetNumber];
           const imagePath = preset?.imagePath || 'images/empty.png';
 
@@ -71,12 +72,11 @@ async function updateCameraBlocks(cameras) {
               <div class="thumbnail-container">
                 <a href="#" onclick="playPreset(${camera.id}, ${presetNumber}, event)">
                   <img class="thumbnail" src="${imagePath}" alt="Preset ${presetNumber}">
-                  <span class="preset-label" contenteditable="true" onblur="saveLabel(this, ${camera.id}, ${presetNumber})">Preset ${presetNumber}</span>
+                  <span class="preset-label" contenteditable="true" onblur="saveLabel(this, ${camera.id}, ${presetNumber})">${presetName}</span>
                 </a>
                 <div class="controls">
                   <button title="Preset ${presetNumber} von der Kamera ${camera.id} mit der IP ${cameraSettings.ip} sichern" onclick="savePreset(${camera.id}, ${presetNumber})">💾</button>
                   <button title="Preset ${presetNumber} von der Kamera ${camera.id} mit der IP ${cameraSettings.ip} löschen" onclick="deletePreset(${camera.id}, ${presetNumber})">🗑️</button>
-                  <button title="Preset ${presetNumber} von der Kamera ${camera.id} mit der IP ${cameraSettings.ip} benennen" onclick="renamePreset(${camera.id}, ${presetNumber})">✏️</button>
                 </div>
               </div>
             </div>
@@ -490,10 +490,16 @@ async function renamePreset(cameraId, presetNumber) {
     const camera = settings.cameras.find(c => c.id === cameraId);
 
     if (camera && camera.presets[presetNumber]) {
-      camera.presets[presetNumber].name = newName; // Name aktualisieren
-      await window.electron.saveSettings(settings); // Änderungen speichern
-      console.log(`Preset ${presetNumber} von Kamera ${cameraId} wurde in "${newName}" umbenannt.`);
-      updateCameraBlocks(settings.cameras); // Anzeige aktualisieren
+      // Speichere den neuen Namen lokal
+      camera.presets[presetNumber].name = newName;
+      await window.electron.saveSettings(settings);
+      console.log(`Preset ${presetNumber} von Kamera ${cameraId} wurde lokal in "${newName}" umbenannt.`);
+
+      // Speichere den neuen Namen auf der Kamera
+      await savePresetToCamera(camera.ip, presetNumber, newName);
+      
+      // Anzeige aktualisieren
+      updateCameraBlocks(settings.cameras);
     } else {
       console.error(`Preset ${presetNumber} oder Kamera ${cameraId} nicht gefunden.`);
     }
@@ -502,6 +508,45 @@ async function renamePreset(cameraId, presetNumber) {
   }
 }
 
+
+async function saveLabel(element, cameraId, presetNumber) {
+  const newName = element.textContent.trim();
+
+  if (!newName) {
+    alert("Der Name darf nicht leer sein.");
+    element.textContent = `Preset ${presetNumber}`; // Fallback auf den alten Namen
+    return;
+  }
+
+  try {
+    const settings = await window.electron.loadSettings();
+    const camera = settings.cameras.find(c => c.id === cameraId);
+
+    if (camera && camera.presets[presetNumber]) {
+      camera.presets[presetNumber].name = newName; // Aktualisiere den Namen
+      await window.electron.saveSettings(settings); // Speichere die Änderungen
+      console.log(`Preset ${presetNumber} von Kamera ${cameraId} wurde in "${newName}" umbenannt.`);
+    } else {
+      console.error(`Preset ${presetNumber} oder Kamera ${cameraId} nicht gefunden.`);
+    }
+  } catch (error) {
+    console.error(`Fehler beim Speichern des Labels: ${error}`);
+  }
+}
+
+async function savePresetToCamera(cameraIP, presetNumber, presetName) {
+  const url = `http://${cameraIP}/-wvhttp-01-/preset/set?p=${presetNumber}&name=${encodeURIComponent(presetName)}`;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Fehler beim Speichern des Preset-Namens auf der Kamera: ${response.statusText}`);
+    }
+    console.log(`Preset ${presetNumber} wurde erfolgreich auf der Kamera ${cameraIP} als "${presetName}" gespeichert.`);
+  } catch (error) {
+    console.error(`Fehler beim Speichern auf der Kamera: ${error}`);
+  }
+}
 
 
 // Initialisieren und Pfade festlegen, sobald das DOM vollständig geladen ist
