@@ -80,7 +80,7 @@ h1 {
 .presets {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
+  gap: 5px;
   justify-items: center;
   width: 100%;
 }
@@ -91,8 +91,16 @@ h1 {
   align-items: center;
   margin: 2px; /* Platzhalter-Margin für nicht ausgewählte Presets */
   border: none; /* Kein Rahmen standardmäßig */
-  
   padding: 5px;
+  background-color: rgb(51,51,51);
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.preset:hover {
+  transform: scale(2); /* Skaliert das gesamte div */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Optionaler Schatten für visuelles Feedback */
+  z-index: 1000;
 }
 
 /* Aktives Preset mit grünem Rahmen */
