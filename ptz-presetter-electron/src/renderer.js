@@ -72,7 +72,7 @@ async function updateCameraBlocks(cameras) {
               <div class="thumbnail-container">
                 <a href="#" onclick="playPreset(${camera.id}, ${presetNumber}, event)">
                   <img class="thumbnail" src="${imagePath}" alt="Preset ${presetNumber}">
-                  <span class="preset-label" contenteditable="true" onblur="saveLabel(this, ${camera.id}, ${presetNumber})">${presetName}</span>
+                  <span class="preset-label" contenteditable="true" onfocus="selectAllText(this)" onblur="saveLabel(this, ${camera.id}, ${presetNumber})">${presetName}</span>
                 </a>
                 <div class="controls">
                   <button class="save-icon" title="Preset ${presetNumber} von der Kamera ${camera.id} mit der IP ${cameraSettings.ip} sichern" onclick="savePreset(${camera.id}, ${presetNumber})">💾</button>
@@ -579,5 +579,13 @@ function highlightPreset(cameraId, presetNumber) {
   }
 }
 
+function selectAllText(element) {
+  const range = document.createRange();
+  const selection = window.getSelection();
+
+  range.selectNodeContents(element); // Wählt den gesamten Textinhalt
+  selection.removeAllRanges(); // Entfernt vorherige Auswahlen
+  selection.addRange(range); // Setzt den neuen Bereich
+}
 
 
